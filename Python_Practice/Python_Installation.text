@@ -1,0 +1,35 @@
+Installing Python on your Windows 10 PC and setting it up with 
+Visual Studio Code (VS Code) is a great way to start working on 
+Python projects. Here's a step-by-step guide to get you started:
+
+    Install Python:
+        Visit the official Python website.
+        Download the latest version for Windows.
+        Run the installer. Ensure to check the box that says 
+        "Add Python to PATH" before clicking "Install Now".
+
+    Verify Python Installation:
+        Open Command Prompt (you can search for cmd in the 
+        Windows search bar).
+        Type python --version and press Enter. If Python is 
+        installed correctly, it should display the version number.
+
+    Set Up Python in VS Code:
+        Open VS Code.
+        If you haven't already, install the Python extension for 
+        VS Code. You can find it in the Extensions view 
+        (Ctrl+Shift+X) by searching for 'Python'.
+        Once the extension is installed, VS Code should 
+        automatically detect the Python interpreter you installed.
+
+    Create and Run a Python File:
+        In VS Code, open a new file and save it with a .py 
+        extension, for example, fizzbuzz.py.
+        Copy the FizzBuzz code into this file.
+        To run the file, you can right-click in the editor 
+        and select "Run Python File in Terminal", or use 
+        the play button in the top right corner of the editor.
+
+    Observing the Output:
+        The output should appear in the terminal at the 
+        bottom of the VS Code window.

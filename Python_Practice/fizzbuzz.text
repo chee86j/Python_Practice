@@ -1,0 +1,126 @@
+Fizz Buzz
+
+Project Specs
+
+Estimated Time to Complete: 20 Minutes
+
+Language: Python
+
+Modality: Command Line Interface (CLI)
+
+Total Lines of Code: 24
+
+Concepts Covered: General
+
+This short project is based on a classic "group word game for children" 
+that helps them learn division. Children sit in a circle; One child says 
+"1," the next child says "2," and so on. However, any number divisible 
+by three is replaced with "fizz," any number divisible by five is 
+replaced with "buzz," and any number divisible by both three and five 
+is replaced by "fizz buzz." Children are eliminated if they hesitate 
+or make a mistake.
+
+A related programming exercise has become common as a basic coding 
+interview question. Despite its simplicity -- Fizz Buzz requires only 
+basic looping and conditionals -- it gives the interviewer a sense of 
+the interviewee's knowledge of fundamental programming concepts.
+Instructions
+
+STEP 1. Let's start with a for loop that prints the numbers 1--20.
+
+STEP 2. Now, we know we need to do something different if the number 
+is divisible by 3, 5, or both. To figure out if a number is divisible 
+by 3 or 5, use %, known as the modulo operator. Executing x % y gives 
+the remainder you would get when dividing x by y. 
+For example, 6 % 5 == 1, 8 % 3 == 2, and 15 % 3 == 0.
+
+Try adding some if, elif, and else statements to check for the proper 
+conditions. Be careful about the order of these statements! When 
+should you check for divisibility by 3 and 5 rather than just 3 or 
+just 5?
+
+At this point you should get the following output:
+
+1
+2
+Fizz
+4
+Buzz
+Fizz
+7
+8
+Fizz
+Buzz
+11
+Fizz
+13
+14
+FizzBuzz
+16
+17
+Fizz
+19
+Buzz
+
+Advanced: A typical version of the above would have four 'branches' 
+-- an if statement, two elifs, and one else. Can you write a version 
+with only three3 branches? Hint 1: Although there are several ways 
+to do this, try using string concatenation to produce the line to 
+be output inside the for loop. Hint 2: You won't need elif or else. 
+You'll have several independent if statements, so that more than 
+one might execute.
+
+Extension: The reason for the modulo lines is not exactly clear. 
+Their real purpose is to check divisibility, but noticing that 
+takes a little thinking or a comment. To increase readability, you 
+might replace them with function calls. You could define either 
+one or two new functions, depending on preferences. In fact, this 
+could be a deliberate part of your design process. Anytime you 
+don't know how to do something, make a blank function with an 
+appropriate name and call it. When you've finished your current 
+task, go back and implement all the blank functions, in the 
+process possibly adding more functions.
+
+STEP 3. Let's make our program more flexible. Extract your loop 
+into a function that takes an integer parameter telling it the 
+last number to go up through. Don't forget to modify your for 
+loop's range appropriately. For example, we might call the 
+function fizzbuzz, and calling fizzbuzz(20) should reproduce 
+the above output.
+
+STEP 4. Now let's have our program take some input from the user. 
+The easiest way to do this is with the input function (introduced 
+on page 24 of Python QuickStart Guide). Don't forget to use the 
+int(...) function to convert the response to an integer!
+
+Extension: What if the user doesn't type a valid integer? Put 
+your prompt into a loop and add some error checking (with try 
+and except) to handle this.
+
+Advanced: Try using command-line arguments instead of the 
+input function. If you need a refresher, see the 'Using 
+Command-Line Arguments' section of Chapter 19: "The Junk Drawer" 
+of Python QuickStart Guide (page 315). Try combining this with 
+the error-handling extension.
+
+STEP 5. (OPTIONAL) Sometimes we want a Python app to serve 
+double duty. We might want to run it as an application, like 
+the previous versions. Other times, we want to be able to 
+import functions or variables from a file into some other file 
+with an import statement. Try importing your previous version 
+in another Python file, or from the Python interpreter's REPL. 
+For example, if you put the input function version in a file 
+named 'fizzbuzz_v4.py', run python (in some environments, you 
+might need python3 instead), then type import fizzbuzz_v4. 
+Notice that you are immediately prompted for an endpoint, and 
+fizzbuzz is executed. In reality, if we import it, we usually 
+do not want to prompt for input or call the function right away.
+
+We can differentiate these two cases with the special attribute
+__name__. This attribute tells us the name of the module. If 
+python is used to directly execute a file, __name__ will be 
+__main__; otherwise, it will be equal to the module name, i.e., 
+the filename without the '.py' extension. This is why you often 
+see if __name__ == '__main__': in Python files. Try adding this 
+to your program so that fizzbuzz is only executed when run 
+directly, but the fizzbuzz function can still be imported safely.
