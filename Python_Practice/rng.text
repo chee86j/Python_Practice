@@ -1,0 +1,78 @@
+Random Number Generator (CLI)
+
+Project Specs
+
+Estimated Time to Complete: 20 Minutes
+
+Language: Python
+
+Modality: Command Line Interface (CLI)
+
+Total Lines of Code: 21
+
+Concepts Covered: random
+
+In this project, you will create a command-line interface (CLI) 
+tool using Python that will generate random numbers for you. 
+Random number generation plays a key role in various 
+applications, from games to simulations. By creating a CLI app, 
+you'll learn how to interact with the terminal, manage arguments, 
+and handle user input.
+Instructions
+1. Basic Setup
+
+    Create a new Python file, e.g., rng.py.
+
+2. Generation in a Fixed Range
+
+    Import the random module and use random.randint() to generate 
+    a random number between 1 and 100.
+    Print this value.
+    Run your program to see that it generates random numbers.
+
+3. User Input
+
+    Import the sys module, which will let us access command-line 
+    arguments.
+    Read two numbers from the command line: a minimum and a maximum 
+    value for the random number.
+    Be sure to handle cases where the user provides less than or 
+    more than two numbers.
+
+4. Refining User Input: Optional Values
+
+    The user might not always want to provide two values if good 
+    defaults are provided. Let's add some conveniences.
+    If no inputs are provided, use a default range (e.g., 1 to 100).
+    If one input is provided, assume this is the maximum and set 
+    the minimum to 1.
+    If two inputs are provided, handle it as above.
+
+5. Error Handling and Feedback
+
+    Ensure the program gracefully handles invalid inputs, like 
+    non-integer values.
+    Be sure to check that the maximum value isn't smaller than 
+    the minimum value.
+    Provide clear error messages and feedback.
+
+6. Enhancements (Optional)
+
+    Introduce a mechanism to generate multiple random numbers at 
+    once. Perhaps the user can provide another number telling how 
+    many numbers to generate.
+    Instead of relying on positional arguments, use the optparse 
+    module to allow the use of options, e.g., python rng.py --min=3 
+    --max=42 5 would generate five random numbers between 3 and 42.
+    In combination with the previous item, implement a -h flag that 
+    provides clear instructions on how to use the tool.
+    Look up "random seeds" and allow setting of Python's random seed.
+    Allow the generation of random floating-point numbers within a 
+    range. Consider allowing non-uniform distributions, such as 
+    Gaussian (normal) using random.gauss().
+    Beautify the output: consider incorporating ASCII art or colors.
+    Instead of generating random numbers, allow users to input a 
+    list of items (like names) and randomly pick one from the list. 
+    The user could provide the items on the command line, or they 
+    could provide a filename with one item per line. This is great 
+    practice for reading files.
