@@ -18,12 +18,24 @@ Goals
     AI Teaching Assist: Using the Custom 'Code Tutor' in ChatGPT4 Khanmigo Lite, by Khan Academy as a guide.
     Share My Experience: Regularly updating this repository with progress, insights, and reflections.
 
-Progress Log
+## Progress Log
 
-    Start Date: [Your Start Date]
-    Initial Steps: Getting accustomed to Python syntax and basic constructs.
-    First Milestones: Completing introductory exercises from the guide.
-    Ongoing updates will be added here.
+### Start Date: January 12, 2024
+- Initial Steps: Getting accustomed to Python syntax and basic constructs.
+- First Milestones: Completing introductory exercises from the guide.
+
+### Ongoing Updates
+#### 1.13.2024 - 'FizzBuzz'
+- Implemented the 'FizzBuzz' exercise, focusing on Python's syntax differences from JavaScript, especially in loops and conditional statements.
+- Explored Python-specific features like list comprehensions and inline conditional expressions, applying them to solve the FizzBuzz problem efficiently.
+
+#### 1.14.2024 - 'rng (Random Number Generator)'
+- Developed a CLI tool in Python to generate random numbers, enhancing understanding of command-line arguments handling with the `sys` module.
+- Delved into error handling in Python, learning to validate and process user input effectively.
+- Gained experience with Python's `random` module for generating random numbers within user-defined ranges.
+
+Future updates and learning milestones will be added here.
+
 
 Projects
 
@@ -31,10 +43,6 @@ Projects
     Project 2: TBD (A more complex application)
     Further projects will be added as I progress.
 
-Reflections and Insights
-
-    First Impressions: I'm intrigued by Python's elegant syntax and versatility compared to JavaScript.
-    Learning Highlights: (Regularly updated with key learning points and challenges.)
 
 Resources
 
