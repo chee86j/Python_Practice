@@ -243,3 +243,47 @@ if __name__ == '__main__':
         print(f"The argument '{sys.argv[1]}' is not a valid integer.")  # Error message, like 'console.error' in JS
 
 # This script can be run directly with a command-line argument or imported into another Python script.
+
+"""
+Summary: Transition from JavaScript to Python - FizzBuzz Example
+
+1. Python Syntax vs JavaScript Syntax:
+   - Python uses indentation for code blocks, not braces {}.
+   - No semicolons at the end of statements in Python.
+
+2. For Loop:
+   - Python’s 'for i in range(1, n+1)' is like JavaScript’s 'for (let i = 1; i <= n; i++)'.
+   - 'range(start, stop)' in Python generates numbers, where 'stop' is exclusive.
+
+3. Conditional Statements:
+   - Python uses 'if', 'elif' (else if), and 'else', similar to JavaScript.
+   - Conditions in Python do not require parentheses.
+
+4. Function Definition:
+   - Functions are defined using 'def' in Python, akin to 'function' in JavaScript.
+   - Example: 'def fizzbuzz(n):' vs 'function fizzbuzz(n) { ... }'.
+
+5. Print Function:
+   - Python uses 'print()' for console output, equivalent to 'console.log()' in JavaScript.
+
+6. Command-Line Arguments:
+   - Python uses the 'sys' module for command-line arguments.
+   - 'sys.argv' is a list containing arguments, similar to 'process.argv' in Node.js.
+
+7. Modular Code with '__name__ == "__main__"':
+   - Allows script to be used both as an importable module and standalone script.
+   - Similar to using a function call based on a condition in JavaScript.
+
+8. Error Handling:
+   - Python uses 'try-except' blocks, akin to 'try-catch' in JavaScript.
+
+9. SSH and Git Usage in Python Development:
+   - Understanding SSH and GitHub setup is important for managing Python code.
+
+10. The FizzBuzz Logic:
+    - Involves iterating through a range of numbers and applying conditional checks.
+    - Prints "Fizz", "Buzz", "FizzBuzz", or the number based on divisibility by 3 and 5.
+
+This summary encapsulates key points for JavaScript developers transitioning to Python, using the FizzBuzz problem as an illustrative example.
+"""
+# Python code can follow here, such as the implementation of the FizzBuzz function or other related logic.
