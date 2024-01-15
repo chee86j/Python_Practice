@@ -48,4 +48,38 @@ value = random.randint(range_min, range_max) # the value is a random integer bet
 
 print(value)
 
+# -----------------------------------------------------------------------
 # What if you try to use a non-integer value for the minimum or maximum range?
+# or if you try to set the maximum range to a value less than the minimum range?
+import sys 
+import random 
+
+DEFAULT_MIN = 1 
+DEFAULT_MAX = 100 
+
+if len(sys.argv) > 3: 
+  print("Usage: python ./rng [min] [max]") 
+  sys.exit(1) 
+
+# We add a try-except block to catch the ValueError exception that is raised 
+# or when minimum > maximum range.
+try:  
+  if len(sys.argv) == 1: 
+    range_min, range_max = DEFAULT_MIN, DEFAULT_MAX
+  elif len(sys.argv) == 2: 
+    range_min, range_max = DEFAULT_MIN, int(sys.argv[1])
+  else:
+    range_min, range_max = int(sys.argv[1]), int(sys.argv[2])
+
+except ValueError: # similar to a TypeError in JavaScript
+  print("Random number generator endpoints must be integers.")
+  sys.exit(1)
+
+# additional check to ensure the maximum range is not less than the minimum
+if range_max < range_min: 
+  print("Maximum range must be greater than minimum range.")
+  sys.exit(1)
+
+value = random.randint(range_min, range_max)
+
+print(value)
