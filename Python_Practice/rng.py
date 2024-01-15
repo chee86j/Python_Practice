@@ -22,17 +22,30 @@ print(value)
 # python rng.py
 
 #-----------------------------------------------------------------------
-# With Error Handling if User does not provide 2 arguments
+# With Error Handling if User does not provide enough arguments
 
 import sys # this module provides access to some variables used or maintained by the interpreter and to functions that interact strongly with the interpreter.
 import random # this module implements pseudo-random number generators for various distributions.
+
+DEFAULT_MIN = 1 # the default minimum range is 1
+DEFAULT_MAX = 100 # the default maximum range is 100
 
 if len(sys.argv) > 3: # if the length of the argument vector is greater than 3
   print("Usage: python ./rng [min] [max]") # print this message
   sys.exit(1) # exit with a status of 1
 
-range_min = int(sys.argv[1]) # the minimum range is the first argument parsed as an integer
-range_max = int(sys.argv[2]) # the maximum range is the second argument parsed as an integer
+if len(sys.argv) == 3: # if the length of the argument vector is equal to 3
+  range_min = DEFAULT_MIN = int(sys.argv[1]) # the minimum range is the first argument parsed as an integer
+  range_max = DEFAULT_MAX = int(sys.argv[2]) # the maximum range is the second argument parsed as an integer
+elif len(sys.argv) == 2:
+    range_min = DEFAULT_MIN
+    range_max = int(sys.argv[1])
+else:
+    range_min = int(sys.argv[1]) # the minimum range is the first argument parsed as an integer
+    range_max = int(sys.argv[2]) # the maximum range is the second argument parsed as an integer
+
 value = random.randint(range_min, range_max) # the value is a random integer between the minimum and maximum range
 
 print(value)
+
+# What if you try to use a non-integer value for the minimum or maximum range?
