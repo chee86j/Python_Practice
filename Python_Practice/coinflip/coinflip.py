@@ -56,4 +56,5 @@ print(f"Result: {total} Heads, {NUM_FLIPS - total} Tails. "
 # Calculate and print the number of heads, tails, and the percentage of heads
 # {:.2f} in f-string is for formatting to 2 decimal places, akin to toFixed(2) in JS
 
+
 #-----------------------------------------------------------------------
