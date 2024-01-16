@@ -1,0 +1,28 @@
+    Flipping the Coin:
+        Utilize random.randint() for the coin flip: 0 for heads ('H'), 1 for tails ('T').
+        In a loop, simulate the coin flips and print 'H' or 'T' accordingly.
+
+    Computing Stats:
+        Track each flip's outcome within the loop.
+        Post-loop, display the counts of heads, tails, and the heads percentage.
+
+    Handling Arguments:
+        Use argparse for command-line argument handling.
+        Create an ArgumentParser object with your program description.
+        Add an -n integer argument for setting the number of flips, with a default and help text.
+        Retrieve arguments with parse_args() and use them to control loop iterations.
+        Test the program and its --help option for command-line usage.
+
+    Extra Arguments (Optional):
+        Add arguments like --verbose ('-v') for detailed output and --stats ('-s') for statistics.
+        Define conventions, like showing stats only with --stats and detailed flips with --verbose.
+
+    Testing and Error Handling:
+        Test with various options, including edge cases like negative flip numbers.
+        Implement error handling for invalid inputs with user-friendly messages.
+
+    Enhancements (Optional):
+        Implement a terminal-based bar graph for visual results.
+        Add an option to output results to a file.
+        Extend the simulator for other random events like dice rolls.
+        Calculate the likelihood of observed heads percentage based on simulation results.

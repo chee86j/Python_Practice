@@ -53,9 +53,3 @@ Resources
     https://www.youtube.com/watch?v=_uQrJ0TkZlc
     2. freeCodeCamp.org - Learn Python - Full Course for Beginners [Tutorial] - 
     https://www.youtube.com/watch?v=rfscVS0vtbw
-
-Contributions and Collaboration
-
-I welcome any suggestions, resources, and support from fellow learners 
-and experienced developers. Feel free to fork this repo, create pull requests, or reach out with advice.
-
