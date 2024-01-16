@@ -58,3 +58,87 @@ print(f"Result: {total} Heads, {NUM_FLIPS - total} Tails. "
 
 
 #-----------------------------------------------------------------------
+
+# 4. Argument Parsing Module Unique to Python
+import random
+from argparse import ArgumentParser
+
+# Create an instance of ArgumentParser with a program description
+parser = ArgumentParser(description="Simulate coin flip and optionally show statistics.")
+
+parser.add_argument("n", "--num_flips", type=int, default=1,
+                    help="Specify number of coin flips to simulate [default: %(default)s]")
+args = parser.parse_args()
+
+total = 0 
+for i in range(args.num_flips):
+    flip = random.randint(0,1)
+    total += flip 
+    face = 'H' if flip else 'T' 
+    print(f"Flip #{i+1}: {face}")
+
+print(f"Result: {total} Heads, {NUM_FLIPS - total} Tails. "
+      f"({total / NUM_FLIPS * 100:.2f}% heads)")
+
+
+#-----------------------------------------------------------------------
+
+# Explanation of above code:
+# Import the random module for generating random numbers
+import random
+# Import ArgumentParser from the argparse module for command-line argument handling
+from argparse import ArgumentParser
+
+# Create an ArgumentParser object with a description for the coin flip simulator
+parser = ArgumentParser(description="Simulate coin flip and optionally show statistics.")
+
+# Add a command-line argument to specify the number of coin flips
+# "n" is the positional argument, "--num_flips" is the optional argument
+# type=int ensures the input is an integer
+# default=1 sets the default number of flips to 1 if not specified
+# help parameter describes this argument's purpose
+parser.add_argument("n", "--num_flips", type=int, default=1,
+                    help="Specify number of coin flips to simulate [default: %(default)s]")
+
+# Parse the arguments provided at the command line
+args = parser.parse_args()
+
+# Initialize a variable to count the number of heads
+total = 0 
+
+# Loop for the number of times specified by the command-line argument
+for i in range(args.num_flips):
+    # Generate a random number: 0 for heads, 1 for tails
+    flip = random.randint(0,1)
+    
+    # Add flip value to total; total increments if flip is 1 (heads)
+    total += flip 
+    
+    # Determine if the flip is heads ('H') or tails ('T')
+    # Python's shorthand for the ternary operator (condition ? exprIfTrue : exprIfFalse in JS)
+    face = 'H' if flip else 'T' 
+
+    # Print the result of each flip using string formatting
+    print(f"Flip #{i+1}: {face}")
+
+# Print the final results: total heads, total tails, and percentage of heads
+# Here, NUM_FLIPS should be args.num_flips for correct execution
+print(f"Result: {total} Heads, {args.num_flips - total} Tails. "
+      f"({total / args.num_flips * 100:.2f}% heads)")
+
+#   Key Takeaways:
+#   The argparse module is used to define how the script should 
+#   interpret command-line arguments. This allows the script to 
+#   be more dynamic and user-interactive, similar to reading 
+#   command-line arguments in a Node.js application but with 
+#   a more structured approach.
+
+#   This approach makes the script more flexible, allowing users 
+#   to specify the number of coin flips directly from the command 
+#   line when running the script. The argparse module automatically 
+#   handles incorrect inputs and provides help messages, making the 
+#   script more user-friendly.
+
+#   When the script is run, the user can specify the number of flips 
+#   using this argument. For example, running python scriptname.py 
+#   --num_flips 10 would set the number of coin flips to 10.
