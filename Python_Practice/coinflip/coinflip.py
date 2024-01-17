@@ -165,6 +165,10 @@ parser.add_argument("-s", "--stats", action="store_true", default=False,
                     help="Compute and show statistics")
 args = parser.parse_args()
 
+if args.num_flips < 0: # if the number of flips is less than 0
+    print(f"Expected a non-negative number of flips, not (args.num_flips))") 
+    exit(1)
+
 total = 0 
 for i in range(args.num_flips):
     flip = random.randint(0,1)
