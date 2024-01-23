@@ -266,7 +266,7 @@ if __name__ == "__main__":
 # -----------------------------------------------------------------------
 
 
-# Python Learning Journey: From a JavaScript Background
+# Python Learning Journey: This Project's Notes From a JavaScript Background
 
 # 1. Python's Syntax for Defining Functions:
 # In Python, functions are defined using the 'def' keyword, not 'function' as in JavaScript.
