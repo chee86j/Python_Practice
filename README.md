@@ -2,14 +2,13 @@ My Python Learning Adventure
 
 Introduction
 
-Hello and welcome to my GitHub repository dedicated to learning Python! I'm currently expanding my programming 
-expertise from JavaScript to Python, and this repository is where I'll be documenting my journey. I've chosen 
-to follow the Programming QuickStart Guides Bundle as my primary learning resource.
+Hello and welcome to my GitHub repository dedicated to learning Python! I'm currently expanding my programming expertise from JavaScript to Python, and this repository is where I'll be documenting my journey. I've chosen to follow the Programming QuickStart Guides Bundle as my primary learning resource.
 
 Background
 As a JavaScript developer, I've decided to challenge myself by diving into Python. This journey isn't just 
 about learning a new language; it's about opening up new opportunities and perspectives in the world of 
 programming.
+
 Goals
 
     Master Python Basics: Starting with the essentials and gradually progressing to more complex topics.
@@ -33,6 +32,18 @@ Goals
 - Developed a CLI tool in Python to generate random numbers, enhancing understanding of command-line arguments handling with the `sys` module.
 - Delved into error handling in Python, learning to validate and process user input effectively.
 - Gained experience with Python's `random` module for generating random numbers within user-defined ranges.
+
+#### [1.16.2024] - 'Coin Flip Simulation'
+- Created a simple coin flip simulation program.
+- Practiced using Python's random module to simulate random outcomes.
+- Reinforced my understanding of basic Python programming concepts and syntax.
+
+#### [1.22.2024] - 'Temperature Converter (Python GUI)'
+- Developed a GUI-based temperature conversion application using PySide6.
+- Gained practical experience in GUI programming, exploring Python's capabilities beyond the console.
+- Familiarized myself with event-driven programming, signal-slot mechanisms, and layout management in PySide6.
+
+
 
 Future updates and learning milestones will be added here.
 
