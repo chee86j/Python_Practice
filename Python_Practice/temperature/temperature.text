@@ -1,0 +1,108 @@
+Temperature Converter (Python GUI)
+
+Project Specs
+
+Estimated Time to Complete: 45 Minutes
+
+Language: Python
+
+Modality: Graphical User Interface (GUI)
+
+Total Lines of Code: 65
+
+Concepts Covered: QT, Classes
+
+In this project, you will create a simple temperature converter using PySide2. This library provides a comprehensive set of Python bindings for popular graphical library Qt, which allows us to quickly and easily generate native graphical application interfaces. With this desktop app, users can convert temperatures between Fahrenheit and Celsius. After this, you'll have a solid foundation for developing more complex graphical apps in the future.
+
+Dealing with a graphical library like Qt can be overwhelming. I've provided some guidance below, but I've intentionally not spelled everything out. A foundational software development skill is being able to read documentation, so I recommend having the documentation open while doing the project.
+Instructions
+
+1. Setting Up
+
+    If you haven't already, install PySide2 using pip install PySide2. You are welcome to use a virtual environment if you're familiar with them.
+    Take note of the version that was installed by running the following:
+
+----------------------------------------------------------------------------------------
+
+    ### Note that with Python 3.12+ you will need to install 'pip install pyside6' ###
+    Changes: https://wiki.qt.io/Qt_for_Python
+
+    Updated import statements from PySide2 to PySide6.
+    Modified QtCore.Qt import since QtCore is now a separate module in PySide6.
+
+----------------------------------------------------------------------------------------
+
+    Notes on PySide6
+
+    What is PySide6?
+        PySide6 is the official set of Python bindings for the Qt application framework, version 6. It allows you to create cross-platform graphical user interface (GUI) applications using Python.
+        PySide6 provides access to the Qt framework, which is widely used for developing desktop applications, as well as applications for embedded and mobile platforms.
+
+    Features of PySide6:
+        Cross-Platform Compatibility: Applications built with PySide6 can run on different operating systems like Windows, macOS, and Linux without significant changes to the code.
+        Rich Set of Widgets: PySide6 offers a wide range of pre-built widgets like buttons, text inputs, labels, and many more, making it easier to create complex GUIs.
+        Customizable and Extensible: You can customize widgets and even create your own for specific needs.
+        Event-Driven: PySide6, like other GUI frameworks, is event-driven. This means it responds to user interactions (like clicks and key presses) using an event loop.
+
+    Suitability for GUI Development:
+        PySide6 is suitable for both simple and complex GUI applications. Its integration with Python makes it an excellent choice for Python developers looking to create modern desktop applications.
+
+----------------------------------------------------------------------------------------
+
+
+import PySide2
+print(PySide2.__version__)
+
+    Go to this documentation page and click the "Qt for Python" version that corresponds to your installed version. This documentation will be very useful to you! After clicking your version, make particular note of the "Quick search" box on the left, which allows you to quickly search for the widget class you might be working with.
+
+    Create a new Python file for your project.
+
+2. Basic PySide2 Application (QApplication)
+
+    To start, create a basic PySide2 window:
+
+import sys    
+from PySide2.QtWidgets import QApplication, QWidget
+
+app = QApplication(sys.argv)
+window = QWidget()
+window.setWindowTitle('Temperature Converter')
+window.show()
+sys.exit(app.exec_())
+
+    Take note of the import line; you'll need to add the correct imports as we go along. Most classes we need come from PySide2.QtWidgets, just as above.
+    Run this to ensure you have a functioning PySide2 installation and to familiarize yourself with the basic window.
+
+3. Main Application Layout (QWidget, QVBoxLayout, QHBoxLayout)
+
+    Define a new class, e.g., TemperatureConverterApp, which inherits from QWidget.
+    Define a constructor that calls the parent's contructor, and initialize the UI.
+    You can choose whatever components and layouts you please. I recommend simple layouts like QVBoxLayout or QHBoxLayout. Once you create such a layout object, you can repeatedly add widgets to it (with the addWidget method). Each added widget is simply placed next to the previous one, either horizontally (QHboxLayout) or vertically (QVBoxLayout). You can nest layouts by using the addLayout() method to place one layout inside another. For example, in my version I put several groups of widgets within their own vertical layout, but I put those vertical layouts within a top-level horizontal layout.
+    Now create the input fields. I recommend a QLineEdit for the input itself, and a QLabel with some text to describe it.
+    Be sure to set each of your widgets as instance variables of your TemperatureConverterApp class, so that you can access them in other methods.
+    Add some QPushButtons. These will later initiate the conversions.
+    Once you've added all your widgets to the right layouts, set the main layout of your app: self.setLayout(main_layout), where main_layout is the layout object that contains everything else.
+    Run your program to make sure everything appears in the right place.
+
+4. Extracting Input and Converting
+
+    Define two new methods of your TemperatureConverterApp class to do the conversions. I called mine to_celsius and to_fahrenheit.
+    Each method should extract the text from the appropriate input box (use the text() method), convert it to a float, perform the conversion, and set the text of the other input box using the setText() method.
+    To convert to Celsius, use the formula C = ( F − 32 ) ∗ 5 / 9 .
+    To convert to Fahrenheit, use the formula F = C ∗ 9 / 5 + 32 .
+    You'll need to connect these methods to the appropriate buttons in your constructor. You can use the clicked.connect() method of QPushButton for this. For example, the line self.btn_to_celsius.clicked.connect(self.to_celsius) connects my btn_to_celsius push button to the to_celsius method.
+    Run your program and make sure it does the correct conversions and displays the results correctly.
+
+5. Error Handling
+
+    In your conversion functions, catch any exceptions that might occur, especially ValueErrors when the user inputs something non-numeric.
+    When an exception occurs, display an appropriate error message to the user. You could, for example, pop up a QMessageBox, or have a QLabel in the main layout that displays the message.
+    Be sure to clear any error messages once the user actually inputs a valid number and performs a conversion.
+    Run your program and test various temperature conversions, including inputting non-numeric values to see the error messages.
+
+6. Enhancements (Optional)
+
+    Allow users to toggle between Celsius and Fahrenheit using a single button.
+    Style your application further using PySide2's stylesheets.
+    Implement functionality to convert to/from other temperature scales, like Kelvin.
+    Build a similar app for converting between other units, e.g., imperial and metric.
