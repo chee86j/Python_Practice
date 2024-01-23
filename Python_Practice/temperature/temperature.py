@@ -229,27 +229,32 @@ class TemperatureConverterApp(QWidget):
         main_layout.addWidget(self.error_label, alignment=QtCore.Qt.AlignCenter)
         self.setLayout(main_layout)
         
+        # Connecting button clicks to their respective functions
         self.btn_to_celsius.clicked.connect(self.to_celsius)
         self.btn_to_fahrenheit.clicked.connect(self.to_fahrenheit)
     
+    # Function to convert Fahrenheit to Celsius
     def to_celsius(self):
         try:
-            text = self.edit_fahrenheit.text()
-            fahrenheit = float(text)
-            celsius = (fahrenheit - 32) * 5/9
-            self.edit_celsius.setText(str(celsius))
-            self.error_label.setText("")
+            text = self.edit_fahrenheit.text()  # Getting text from Fahrenheit input
+            fahrenheit = float(text)  # Converting text to float
+            celsius = (fahrenheit - 32) * 5/9  # Conversion formula
+            self.edit_celsius.setText(str(celsius))  # Updating Celsius input with result
+            self.error_label.setText("")  # Clearing error message
         except ValueError:
+            # Displaying error message if input is not a valid number
             self.error_label.setText(f"Invalid input: {text}")
 
+    # Function to convert Celsius to Fahrenheit
     def to_fahrenheit(self):
         try:
-            text = self.edit_celsius.text()
-            celsius = float(text)
-            fahrenheit = celsius * 9/5 + 32
-            self.edit_fahrenheit.setText(str(fahrenheit))
-            self.error_label.setText("")
+            text = self.edit_celsius.text()  # Getting text from Celsius input
+            celsius = float(text)  # Converting text to float
+            fahrenheit = celsius * 9/5 + 32  # Conversion formula
+            self.edit_fahrenheit.setText(str(fahrenheit))  # Updating Fahrenheit input with result
+            self.error_label.setText("")  # Clearing error message
         except ValueError:
+            # Displaying error message if input is not a valid number
             self.error_label.setText(f"Invalid input: {text}")
             
 if __name__ == "__main__":
