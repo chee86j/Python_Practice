@@ -22,6 +22,34 @@ Instructions
     If you haven't already, install PySide2 using pip install PySide2. You are welcome to use a virtual environment if you're familiar with them.
     Take note of the version that was installed by running the following:
 
+----------------------------------------------------------------------------------------
+
+    ### Note that with Python 3.12+ you will need to install 'pip install pyside6' ###
+    Changes: https://wiki.qt.io/Qt_for_Python
+
+    Updated import statements from PySide2 to PySide6.
+    Modified QtCore.Qt import since QtCore is now a separate module in PySide6.
+
+----------------------------------------------------------------------------------------
+
+    Notes on PySide6
+
+    What is PySide6?
+        PySide6 is the official set of Python bindings for the Qt application framework, version 6. It allows you to create cross-platform graphical user interface (GUI) applications using Python.
+        PySide6 provides access to the Qt framework, which is widely used for developing desktop applications, as well as applications for embedded and mobile platforms.
+
+    Features of PySide6:
+        Cross-Platform Compatibility: Applications built with PySide6 can run on different operating systems like Windows, macOS, and Linux without significant changes to the code.
+        Rich Set of Widgets: PySide6 offers a wide range of pre-built widgets like buttons, text inputs, labels, and many more, making it easier to create complex GUIs.
+        Customizable and Extensible: You can customize widgets and even create your own for specific needs.
+        Event-Driven: PySide6, like other GUI frameworks, is event-driven. This means it responds to user interactions (like clicks and key presses) using an event loop.
+
+    Suitability for GUI Development:
+        PySide6 is suitable for both simple and complex GUI applications. Its integration with Python makes it an excellent choice for Python developers looking to create modern desktop applications.
+
+----------------------------------------------------------------------------------------
+
+
 import PySide2
 print(PySide2.__version__)
 
