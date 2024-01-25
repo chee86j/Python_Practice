@@ -1,0 +1,43 @@
+Dice Roll Simulator (Python CLI)
+Project Specs
+
+Estimated Time to Complete: 1 Hour 30 Minutes
+
+Language: Python
+
+Modality: Command Line Interface (CLI)
+
+Total Lines of Code: 50
+
+Concepts Covered: argparse, random, complicated logic
+
+In this project, you'll develop a command-line interface (CLI) application that simulates dice rolls. While this project builds upon concepts from the Coin Flip Simulation project, it introduces additional complexity by allowing multiple dice with varied sides. Users will have the flexibility to customize the number of dice, the number of rolls, and the number of sides per die. The program can display individual roll results, aggregate statistics, or both.
+
+This project offers an excellent opportunity to hone your fundamental programming skills. Expect to employ nested loops and more advanced logic, and harness some of Python's versatile features.
+
+Instructions
+1. Setup
+Create a new Python file for your project.
+2. One Dice Roll
+Initially, consider a single roll of two dice, each having six sides.
+Utilize the random.randint() function to emulate a dice roll, generating a list of random numbers that represent the outcome of each die.
+Display both the individual die results and their combined total.
+3. Multiple Rolls
+Embed the single roll code within a loop to simulate multiple consecutive rolls. For simplicity, set a fixed number of rolls initially.
+4. Compute Basic Stats
+Add code to compute basic statistics for the rolls: minimum, maximum, average (mean), and number of doubles. You could add code to your loop to compute information as you go, or you could save the result of each roll and only compute the statistics at the end.
+For simplicity, interpret "doubles" as rolls where all dice yield the same number, even when more than two dice are used.
+Print the resulting stats to the screen.
+5. Compute More Stats (Optional)
+Try computing the median. This will require sorting a list of all roll totals and picking the middle value (or averaging the two central values for an even number of rolls).
+Also try computing the mode. One approach is to use the Counter class from Python's collections module. You'll find the documentation useful.
+6. Handling Arguments
+Import argparse and set up your program to allow users to specify the number of dice, number of rolls, and sides per die. Optionally, you can let them choose whether or not to display stats and whether or not to display all individual rolls.
+Modify your code to use the specified number of rolls, dice, and sides. This will require changes to your roll generation and statistics calculation code.
+Run your program and make sure it behaves correctly for various inputs. Check the statistical calculations.
+7. Enhancements (Optional)
+Provide an option to save the results to a specified file.
+Implement a visual representation of the results, such as a histogram. There are libraries such as bashplotlib to plot in the terminal. If you have used matplotlib you could instead use that and save plots to a file.
+Enhance the statistics by computing the standard deviation or variance.
+Allow users to simulate other random events.
+Based on the simulation results, calculate the likelihood of various aspects, such as the observed number of "doubles."
