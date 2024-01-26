@@ -213,3 +213,90 @@ Num Doubles: {doubles}""")
 # ---Ref 4---
     # Loop Through Remaining Elements: The for loop iterates over the rest of the elements in 
     # the most_common list (excluding the first one, which is already in mode_vals).
+
+# -------------------------------------------------------------------------------------------------------------------------------------
+# Final Solution seting them up as arguments from the command line with argparse
+import random
+import math 
+from collections import Counter  
+from argparse import ArgumentParser # import ArgumentParser from argparse module
+
+parser = ArgumentParser(description="Simulate dice rolls and optionally statistics") # create an ArgumentParser object
+
+parser.add_argument("-v", "--verbose", action="store_true", default=False,
+                    help="Show result of all coin flips, even if stats=True") # add an argument for verbose
+parser.add_argument("-d", "--num-dice", type=int, default=1,
+                    help="specify the number of dice [default %(default)s]") # add an argument for number of dice
+parser.add_argument("-r", "--num-rolls", type=int, default=1,
+                    help="specify the number of rolls [default %(default)s]") # add an argument for number of rolls
+parser.add_argument("-s", "--num-sides", type=int, default=6,
+                    help="specify the number of die sides [default %(default)s]") # add an argument for number of sides
+parser.add_argument("-t", "--stats", action="store_true", default=False,
+                    help="compute and show stats") # add an argument for stats
+args = parser.parse_args() # tells parser to actually parse the arguments from the command line
+# if user does not specify any arguments, the default values will be used
+# if specify stats, then stats will be shown
+# if specify verbose, then verbose will be shown
+# if specify stats and verbose, then both will be shown
+
+if args.num_rolls < 0: # if num_rolls is less than 0, raise an error
+    print(f"Error: All Dice Options Require Positive Integers (got {args.num_rolls})")
+    exit(1) # exit the program with an error code of 1
+
+
+total, doubles, mn, mx = 0, 0, math.inf, -math.inf 
+rolls = []
+
+for _i in range(num_rolls): 
+    dice = [random.randint(1,args.num_sides) for _i in range(args.num_dice)]  # use args.num_sides and args.num_dice
+    roll = sum(dice) 
+    rolls.append(roll) # append the roll to the rolls list
+    
+    if args.verbose or not args.stats: # if verbose is true or stats is false, print the dice and roll
+        print(*dice, end='') # end='' is used to prevent the print() function from adding a newline character
+        if args.num_dice > 1: # if num_dice is greater than 1, print the roll
+            print(f"\t({roll})", end='')
+        print() # print a newline character
+    
+    
+    #stats
+    mn = min(mn, roll) 
+    mx = max(mx, roll) 
+    total += roll 
+    doubles += (len(set(dice)) == 1)
+    
+
+if args.stats:                      # we add this if statement to only print the stats if args.stats is True
+    # Calculate the median
+    mid = args.num_rolls // 2       # change all num_rolls to args.num_rolls       
+    sorted_rolls = sorted(rolls)
+    median = sorted_rolls[mid]
+    if args.num_rolls % 2 == 0:
+        median += sorted_rolls[mid - 1]
+        median /= 2
+
+    # Calculate the mode
+    most_common = Counter(rolls).most_common()  
+    mode_vals = [most_common[0][0]]  
+    mode_count = most_common[0][1]  
+
+    for val, count in most_common[1:]:  
+        if count == mode_count: 
+            mode_vals.append(val) 
+                                
+        else:
+            break  
+
+# Print final stats and change all num_rolls to args.num_rolls
+print(f"""--- Stats ---
+Min: {mn}
+Mean: {total/args.num_rolls:.2f} 
+Median: {median}
+Mode: {', '.join(str(x) for x in mode_vals)} (each appeared {mode_count} time(s))
+Max: {mx}""") # remove the last line of the f-string
+
+# Final Print Statement
+if args.num_dice > 1: # if num_dice is greater than 1, print the number of doubles
+    print(f"Num Doubles: {doubles}") # and remove the last line of the f-string
+    
+# Additionally you can add validation checks for the number of dice and number of sides or non-integer values
