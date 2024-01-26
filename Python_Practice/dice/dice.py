@@ -99,7 +99,7 @@ Num Doubles: {doubles}""")
 # number total/num_rolls as a float with two decimal places. For example, 1.2345 is formatted as 1.23.
 
 # -------------------------------------------------------------------------------------------------------------------------------------
-# Solution with Median with Counter
+# Solution w/Median & w/Mode using Counter
 import random
 import math 
 from collections import Counter # import Counter from collections module
@@ -145,3 +145,71 @@ Median: {median}
 Mode: [', '.join(str(x) for x in mode_vals)] (each appeared {mode_count} time(s))
 Max: {mx}
 Num Doubles: {doubles}""")
+
+# -------------------------------------------------------------------------------------------------------------------------------------
+# Key Takeaways for Above Solution
+import random
+import math 
+from collections import Counter  # Counter is like a specialized dictionary for counting occurrences
+
+num_rolls = 10
+total, doubles, mn, mx = 0, 0, math.inf, -math.inf 
+rolls = []
+
+for _i in range(num_rolls): 
+    dice = [random.randint(1,6) for _i in range(2)] 
+    roll = sum(dice) 
+    print(*dice, f"\t({roll})") 
+    
+    #stats
+    mn = min(mn, roll) 
+    mx = max(mx, roll) 
+    total += roll 
+    doubles += (len(set(dice)) == 1)
+    
+# Calculate the median
+mid = num_rolls // 2  # Get the middle index (integer division, like Math.floor in JS)
+sorted_rolls = sorted(rolls)  # Sort the rolls to find the median
+median = sorted_rolls[mid]  # Get the middle value for the median
+if num_rolls % 2 == 0:
+    median = (median + sorted_rolls[mid - 1]) / 2  # If even number of rolls, average the two middle values
+
+# Calculate the mode
+most_common = Counter(rolls).most_common()  # Reference 1
+mode_vals = [most_common[0][0]]  # Reference 2
+mode_count = most_common[0][1]  # Reference 3
+
+for val, count in most_common[1:]:  # Reference 4
+    if count == mode_count:  # If the count is the same as the mode count
+        mode_vals.append(val) # Add the value to the list of mode values
+                              # append() is a method that adds an element to the end of a list
+    else:
+        break  # Stop if a different count is found
+
+# Print final stats
+print(f"""--- Stats ---
+Min: {mn}
+Mean: {total/num_rolls:.2f} 
+Median: {median}
+Mode: {', '.join(str(x) for x in mode_vals)} (each appeared {mode_count} time(s))
+Max: {mx}
+Num Doubles: {doubles}""")
+
+# ---Ref 1---
+    # Counter and Most Common: Counter(rolls).most_common() creates a Counter object from 
+    # the rolls list and then applies the most_common() method. This method returns a list 
+    # of tuples, where each tuple contains a value from rolls and its count. 
+    # A tuple is a data structure that is similar to a list, but it is immutable (i.e.,
+    # it cannot be changed). For example, (1, 2) is a tuple containing the values 1 and 2.
+    # The list is sorted in descending order based on the counts.
+# ---Ref 2---
+    # Initializing Mode Values: mode_vals = [most_common[0][0]] initializes a list with the 
+    # first element of the most_common list. This element is the value that has the highest 
+    # count (i.e., the most frequent value). The [0][0] part means you're accessing the first 
+    # element of the first tuple, which is the value itself (not its count).
+# ---Ref 3---
+    # Mode Count: mode_count = most_common[0][1] stores the count of the most frequent value. 
+    # The [0][1] part accesses the count from the first tuple.
+# ---Ref 4---
+    # Loop Through Remaining Elements: The for loop iterates over the rest of the elements in 
+    # the most_common list (excluding the first one, which is already in mode_vals).
