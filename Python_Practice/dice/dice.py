@@ -99,3 +99,49 @@ Num Doubles: {doubles}""")
 # number total/num_rolls as a float with two decimal places. For example, 1.2345 is formatted as 1.23.
 
 # -------------------------------------------------------------------------------------------------------------------------------------
+# Solution with Median with Counter
+import random
+import math 
+from collections import Counter # import Counter from collections module
+# helper data structure that is used to count the number of occurrences of each value in a list
+
+num_rolls = 10
+total, doubles, mn, mx = 0, 0, math.inf, -math.inf 
+rolls = []
+
+for _i in range(num_rolls): 
+    dice = [random.randint(1,6) for _i in range(2)] 
+    roll = sum(dice) 
+    print(*dice, f"\t({roll})") 
+    
+    #stats
+    mn = min(mn, roll) 
+    mx = max(mx, roll) 
+    total += roll 
+    doubles += (len(set(dice)) == 1) 
+
+# For finding the Median
+mid = num_rolls // 2 # integer division
+sorted_rolls = sorted(rolls) # sort rolls
+median = sorted_rolls[mid]
+if num_rolls % 2 == 0:
+    median += sorted_rolls
+    median /= 2
+
+# For finding the Mode
+most_common = Counter(rolls).most_common()
+mode_vals = most_common[0][0]
+mode_count = most_common[0][1]
+for val, count in most_common:
+    if count == mode_count:
+        mode_vals.append(val)
+    else:
+        break
+    
+print(f"""--- Stats ---
+Min: {mn}
+Mean: {total/num_rolls:.2f} 
+Median: {median}
+Mode: [', '.join(str(x) for x in mode_vals)] (each appeared {mode_count} time(s))
+Max: {mx}
+Num Doubles: {doubles}""")
