@@ -1,0 +1,111 @@
+Invisible Man Game (Python GUI)
+
+Project Specs
+
+Estimated Time to Complete: 2 Hours
+
+Language: Python
+
+Modality: Graphical User Interface (GUI)
+
+Total Lines of Code: 177
+
+Concepts Covered: API, Classes, QT, Complicated Logic
+
+In this project you will create the classic Invisible Man game in Python, using the PySide2 library to build a graphical user interface. This library provides a comprehensive set of Python bindings for popular graphical library Qt, which allows us to quickly and easily generate native graphical application interfaces. Our Hangman game allows setting various setup options, retrieving a random word from a web API, and guessing letters/words.
+
+Dealing with a graphical library like Qt can be overwhelming. I've provided some guidance below, but I've intentionally not spelled everything out. A foundational software development skill is being able to read documentation, so I recommend having the documentation open while you're doing the project.
+
+This project is a great opportunity not only to practice with Python itself but to learn how to build graphical user interfaces (with PySide2) and consume web APIs (with requests). After this, you'll have a solid foundation for developing more complex graphical apps in the future!
+Instructions
+
+Overview: we will focus first on getting the UI setup, then on handling the game logic, and finally on random word generation and error handling.
+
+Test your code early and often! The longer you go between tests, the more code you will have to consider when something goes wrong.
+
+1. Setting Up
+
+    If you haven't already, install PySide2 using pip install PySide2. You are welcome to use a virtual environment if you're familiar with them.
+    Take note of the version that was installed by running the following:
+
+import PySide2
+print(PySide2.__version__)
+
+    Go to this documentation page and click the "Qt for Python" version that corresponds to your installed version. This documentation will be very useful to you! After clicking your version, make particular note of the "Quick search" box on the left, which allows you to quickly search for the widget class you might be working with.
+
+    Create a new Python file for your project.
+
+2. Basic PySide2 Application (QApplication)
+
+    To start, create a basic PySide2 window:
+
+import sys
+from PySide2.QtWidgets import QApplication, QWidget
+
+app = QApplication(sys.argv) window = QWidget() window.setWindowTitle('Hangman') window.show() sys.exit(app.exec_()) ```
+
+    Take note of the import line; you'll need to add the correct imports as we go along. Most classes we need come from PySide2.QtWidgets, just as above.
+    Run this to ensure you have a functioning PySide2 installation and to familiarize yourself with the basic window.
+
+3. Create the Setup Screen
+
+    Define a new class, e.g., HangmanUI, which inherits from QWidget.
+    Define a constructor that calls the parent's contructor, and initialize the UI.
+    You can choose whatever components and layouts you please. To start, you might choose a simple layout like QVBoxLayout or QHBoxLayout, showing both the setup screen (options, word selection) and game screen (previous guesses, guess input) at the same time.
+    Once you create such a layout object, you can repeatedly add widgets to it (with the addWidget method). Each added widget is simply placed next to the previous one, either horizontally (QHboxLayout) or vertically (QVBoxLayout). You can nest layouts by using the addLayout() method to place one layout inside another. For example, in my version I put several groups of widgets within their own vertical layout, but I put those vertical layouts within a top-level horizontal layout.
+    Create a setup screen that allows setting various options. Initially, I chose to use a QCheckBox for preventing duplicate guesses, a QCheckBox for showing previous guesses, and a QLineEdit to input the solution word, along with QLabels for each. We will add random word generation later.
+    Use whatever options and widgets you think will be fun. Start simple -- you can always add more later.
+    Add a QPushButton, which will later start the game.
+    Once you've added all your widgets to the right layouts, set the main layout of your app: self.setLayout(main_layout), where main_layout is the layout object that contains everything else.
+    Run your program to make sure everything appears in the right place.
+
+4. Create the Game Screen
+
+    Use more widgets to design the "game" screen, where you will display underscores for each letter (or the actual letter for guessed letters), the previous guesses, inputs for guessing letters and words, and the necessary buttons. Don't forget a button to restart the game.
+    For now, it is simplest to just display the game screen at the same time as the setup screen, perhaps right below it. Later, you can use more advanced techniques to show just one screen at a time.
+
+5. Handling the Game Logic
+
+    We can take actions when a button is pressed with the clicked.connect() method of QPushButton. For example, self.btn_start_game.clicked.connect(self.start_game) connects the start game button to the start_game method.
+    The Hangman game logic is sufficiently complex that we should separate it from the UI logic. Create a new class HangmanGame to handle the game logic. In my design, the constructor takes in a word and an allowed number of guesses. The class keeps track of the game status, the guesses so far, guessed letters, guessed words, and remaining guesses. It should provide methods to guess a letter, guess a word, get the word display (underscores for each letter except guessed letters), and anything else you think will be useful.
+    You can and should test your HangmanGame class separately from the UI. You could test it with simple assert statements or with unit tests (e.g., with Python's built-in unittest module).
+
+6. Connecting the UI with the Game Logic
+
+    When a game is started, your UI object can create an instance of your HangmanGame class and use it as needed.
+    You'll need methods for starting the game, guessing letters, guessing words, and restarting the game. Not to mention any helper methods you might want. Use the HangmanGame instance to handle changing the game state, updating the game screen UI elements appropriately.
+    Don't forget to handle "game over situations" - with a message box, for example.
+    It is possible to write unit tests for GUIs, but it can be hard to get started. For now, play around with your game and try out lots of edge cases.
+
+7. Random Word Generation
+
+    Add an option to randomly generate a word.
+
+    There are many APIs for this; I used https://random-word-api.herokuapp.com/word
+
+    That one allows a query parameter length to specify the length of the word, e.g., https://random-word-api.herokuapp.com/word?length=5 asks for a 5-letter word.
+
+    You can use Python's requests library to consume the API. First make sure the library is installed (pip install requests), then use the requests.get function. You'll find the documentation useful.
+
+    Something like this will work:
+
+    url = 'https://random-word-api.herokuapp.com/word'
+    response = requests.get(url, params={'length': length})
+    if response.status_code != 200:
+      # uh-oh, something went wrong...
+    else:
+      return response.json()[0]
+
+8. Error Handling
+
+    Catch any invalid inputs and show appropriate error messages.
+    If your API request failed (any response status code other than 200), show an appropriate error message and don't start the game.
+
+9. Enhancements (Optional)
+
+    Polish the UI: neatly organize your widgets and use PySide2's stylesheets and additional widget methods to make the GUI more user-friendly.
+    The classic version of Hangman displays a series of stick figures as the user runs out of guesses. Emulate this with any series of images of your own choosing.
+    Display either the setup screen or game screen at one time, but not both. This will require a bit of research on your part (that's part of the fun!). One option is to have your UI inherit from QMainWindow (instead of QWidget) and use a QStackedWidget as the central widget. Each of your screens will be a QWidget object, which can be passed to your QStackedWidget's setCurrentWidget method to switch.
+    It quickly becomes unwieldy to build a UI from Python, forcing you to run the code after each small change to see what it looks like. Consider playing around with Qt Designer to build UIs and integrate the results with your Python code.
+    Allow choosing the category or grammatical type of the word, or allow two- or three-word word phrases. These might require using a different word API.
+    Additional features: timed mode, high scores, hints, or difficulty levels.
