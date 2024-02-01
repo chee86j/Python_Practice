@@ -8,6 +8,7 @@
 
 # To run the pytest test you go to the directory where the test file is located and 
 # run 'pytest test_math_functions.py' in the terminal.
+# if that doesn't work run 'python -m pytest test_math_functions.py' in the terminal.
 # -------------------------------------------------------------------------------------------
 
 def add(a, b):

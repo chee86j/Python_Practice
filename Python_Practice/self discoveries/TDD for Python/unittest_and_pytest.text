@@ -52,6 +52,7 @@ allows you to create test cases by subclassing 'unittest.TestCase'.
                 assert subtract(5, 2) == 3
 
 # 3.    Run Tests: In your terminal, navigate to the directory containing your test file and 
-        execute pytest to run all tests.
+        execute pytest to run all tests using 'pytest test_file_name.py' or 
+        'python -m pytest test_file_name.py'
 # 4.    Review Test Results: Pytest provides a detailed report in the terminal about each test, 
         indicating success or failure.
