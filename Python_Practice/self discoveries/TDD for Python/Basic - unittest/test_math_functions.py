@@ -1,3 +1,6 @@
+# Using the basic unittest module
+# -----------------------------------------------------------------------------------------------------------
+
 import unittest # import the unittest module and the functions we want to test
 from math_functions import add, subtract # import the functions we want to test from the math_functions module
 

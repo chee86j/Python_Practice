@@ -4,6 +4,8 @@ for testing. In Python, the standard way to write tests is
 using the built-in 'unittest' framework or third-party libraries 
 like 'pytest'.
 
+# Using unittest
+
 To write tests for your Python code similar to the Jasmine 
 style you're familiar with, you can use 'unittest'. This framework 
 allows you to create test cases by subclassing 'unittest.TestCase'.
@@ -34,3 +36,22 @@ allows you to create test cases by subclassing 'unittest.TestCase'.
 #     assertFalse, to check the behavior of your functions.
 #     *You can have multiple test cases (methods) within a single test class, and you can 
 #     have multiple test classes in a test file.
+
+# Using pytest
+
+# 1.    Install pytest using the command 'pip install pytest'
+# 2.    Write Test Functions: Create your test file (e.g., test_math_functions.py). Write test 
+        functions that start with test_. Use assert statements for validation. For example:
+
+            from math_functions import add, subtract
+
+            def test_add():
+                assert add(2, 3) == 5
+
+            def test_subtract():
+                assert subtract(5, 2) == 3
+
+# 3.    Run Tests: In your terminal, navigate to the directory containing your test file and 
+        execute pytest to run all tests.
+# 4.    Review Test Results: Pytest provides a detailed report in the terminal about each test, 
+        indicating success or failure.

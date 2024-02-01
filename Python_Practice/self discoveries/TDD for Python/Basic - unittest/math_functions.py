@@ -1,3 +1,6 @@
+# Basic Testing - Using the unittest module
+# -------------------------------------------------------------------------------------------
+
 # 1. We start by creatina  file called math_functions.py that 
 #    contains the functions we want to test.
 
@@ -25,6 +28,13 @@
 #     *You can have multiple test cases (methods) within a single test class, and you can 
 #     have multiple test classes in a test file.
 
+# -------------------------------------------------------------------------------------------
+
+# Advance Testing - Using the Third-Party Library pytest is more sophisticated output and 
+# additional features, consider using a third-party library like pytest. It's a popular 
+# testing framework in the Python community, known for its simple syntax and powerful 
+# features, including detailed and readable error reporting.
+# -------------------------------------------------------------------------------------------
 
 def add(a, b):
     return a + b
