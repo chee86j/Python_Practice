@@ -73,8 +73,9 @@ def divide_with_assert(a, b):
     return a / b
 
 # 10. Explain the difference between syntax errors and exceptions.
-# Answer:   Syntax errors occur when the parser detects an incorrect statement. 
-#           Exception errors occur during execution of a valid code.
+# Answer:   
+#   Syntax errors occur when the parser detects an incorrect statement. 
+#   Exception errors occur during execution of a valid code.
 
 
 # Basics of Python Programming Practice Problems
@@ -86,8 +87,9 @@ print("Jeff - 2024")
 # running the command `python filename.py`.
 
 # 3. Explain the use of indentation in Python.
-# Answer:   Indentation in Python is used to define the scope of loops, 
-#           functions, and classes.
+# Answer:   
+#   Indentation in Python is used to define the scope of loops, 
+#   functions, and classes.
 
 # 4. Convert a simple JavaScript function to Python.
 # JavaScript: function add(a, b) { return a + b; }
@@ -96,19 +98,21 @@ def add(a, b):
     return a + b
 
 # 5. List and explain two Python syntax rules.
-# Answer:   (1) Variables must be assigned before use. 
-#           (2) Indentation defines code blocks.
+# Answer:   
+#   (1) Variables must be assigned before use. 
+#   (2) Indentation defines code blocks.
 
 # 6. Write a script that asks for user input and prints it.
-#       user_input = input("Enter Input to Be Printed: ") to be used in the terminal
-#       for this problem to work with pytest we used a predetermined input value
+#    user_input = input("Enter Input to Be Printed: ") to be used in the terminal
+#    for this problem to work with pytest we used a predetermined input value
 predetermined_input = "Example input" 
 print(predetermined_input)
 
 # 7. Explain the difference between a script and a program.
-# Answer:   A script is a simple, usually small, program, often used 
-#           for automating tasks. A program is a collection of scripts 
-#           and code modules that work together to perform complex tasks.
+# Answer:   
+#   A script is a simple, usually small, program, often used 
+#   for automating tasks. A program is a collection of scripts 
+#   and code modules that work together to perform complex tasks.
 
 # 8. Create a Python script that calculates and prints the area of a rectangle.
 length = 10  # Predetermined length
@@ -117,9 +121,11 @@ area = length * width
 print("Area of the rectangle:", area)
 
 # 9. Describe how Python handles errors during script execution.
-# Answer:   Python raises exceptions when it encounters errors and will stop 
-#           the program unless the exception is handled.
+# Answer:   
+#   Python raises exceptions when it encounters errors and will stop 
+#   the program unless the exception is handled.
 
 # 10. Write a script that opens a text file and prints its contents.
-# with open('yourfile.txt', 'r') as file:
-#     print(file.read())
+#   with open('yourfile.txt', 'r') as file:
+# Answer:
+#   print(file.read())
