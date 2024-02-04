@@ -56,3 +56,5 @@ allows you to create test cases by subclassing 'unittest.TestCase'.
         'python -m pytest test_file_name.py'
 # 4.    Review Test Results: Pytest provides a detailed report in the terminal about each test, 
         indicating success or failure.
+# 5.    Remember to add '.pytest_cache/' and '__pycache__/' to your root .gitignore file to avoid
+        having the pytest cache creation synced with your GitHub repo.
