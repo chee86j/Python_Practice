@@ -1,0 +1,120 @@
+Testing Python code is different from testing JavaScript. 
+In JavaScript, you might use Jasmine or similar frameworks 
+for testing. In Python, the standard way to write tests is 
+using the built-in 'unittest' framework or third-party libraries 
+like 'pytest'.
+
+Alternatively, there are other automation testing tools like
+'PyUnit aka unittest', 'Behave', 'Splinter', and 'Robot'
+
+--------------------------------------------------------------------------------------------------
+
+# -----Using unittest (PyUnit)-----
+
+To write tests for your Python code similar to the Jasmine 
+style you're familiar with, you can use 'unittest'. This framework 
+allows you to create test cases by subclassing 'unittest.TestCase'.
+
+# 1. We start by creatina  file called math_functions.py that 
+#    contains the functions we want to test.
+
+# 2. Then we create a file called test_math_functions.py in order
+#    to write our test cases.
+
+# 3. We import the unittest module and the functions we want to test
+#    from the math_functions module.
+
+# 4. To run the tests, we use the unittest.main() function, and in the
+#    command line we run the test_math_functions.py file with the command
+#    'python test_math_functions.py.'
+
+# your_project/
+# │
+# ├── math_functions.py       # File containing functions to test
+# └── test_math_functions.py  # File containing unittest test cases
+
+# Tips
+
+#     *Each test method in your unittest.TestCase subclass should start with the word test. 
+#     This naming convention informs the test runner about which methods represent tests.
+#     *Use assert methods provided by unittest.TestCase, such as assertEqual, assertTrue, 
+#     assertFalse, to check the behavior of your functions.
+#     *You can have multiple test cases (methods) within a single test class, and you can 
+#     have multiple test classes in a test file.
+
+--------------------------------------------------------------------------------------------------
+
+# -----Using pytest-----
+
+# 1.    Install pytest using the command 'pip install pytest'
+# 2.    Write Test Functions: Create your test file (e.g., test_math_functions.py). Write test 
+        functions that start with test_. Use assert statements for validation. For example:
+
+            from math_functions import add, subtract
+
+            def test_add():
+                assert add(2, 3) == 5
+
+            def test_subtract():
+                assert subtract(5, 2) == 3
+
+# 3.    Run Tests: In your terminal, navigate to the directory containing your test file and 
+        execute pytest to run all tests using 'pytest test_file_name.py' or 
+        'python -m pytest test_file_name.py'
+# 4.    Review Test Results: Pytest provides a detailed report in the terminal about each test, 
+        indicating success or failure.
+# 5.    Remember to add '.pytest_cache/' and '__pycache__/' to your root .gitignore file to avoid
+        having the pytest cache creation synced with your GitHub repo.
+
+
+
+---------------##### PYTHON TESTING TOOLS #####---------------
+-----PyUnit (unittest)-----
+
+Also known as unittest, it is Python's built-in testing framework inspired by Java's JUnit.
+Focuses on unit testing, which means testing individual components or functions in isolation.
+Requires writing test classes that inherit from unittest.TestCase and using methods like assertEqual 
+to make assertions.
+Primarily used for writing small, isolated tests to verify the correctness of code at the unit level.
+Best suited for developers who prefer a standard library solution for unit testing.
+
+-----Pytest-----
+1. An open-source, third-party testing framework for Python.
+2. Known for its simplicity and ease of use. It doesn't require writing extensive boilerplate code.
+3. Supports various types of testing, including unit, functional, and integration testing.
+4. Allows parametrized testing, fixtures, and plugins, making it highly extensible.
+5. Offers concise and readable test code with detailed failure reports.
+6. Widely adopted and considered one of the most popular testing frameworks for Python.
+
+-----Behave-----
+1. A Behavior-Driven Development (BDD) framework for Python.
+2. BDD is an approach that emphasizes collaboration between developers, testers, and non-technical 
+   stakeholders to define and test software behavior.
+3. Behave uses Gherkin-like syntax for writing feature files, which describe the behavior of the system 
+   in plain language.
+4. Allows writing step definitions in Python code to implement behavior described in feature files.
+5. Useful for teams that want to involve non-technical members in defining and verifying software behavior.
+
+-----Splinter-----
+1. A tool for automating web application testing.
+2. It provides a simple API for interacting with web browsers programmatically.
+3. Can be used in conjunction with testing frameworks like Pytest or Behave for web UI testing.
+4. Supports different web drivers (e.g., Selenium, WebDriver) for browser automation.
+5. Useful for testing web applications, filling out forms, clicking buttons, and verifying web page content.
+
+-----Robot Framework-----
+1. A test automation framework for acceptance testing and acceptance test-driven development (ATDD).
+2. It uses a keyword-driven approach, where test cases are written using keywords and arguments.
+3. Supports test libraries for various purposes, including web testing, database testing, and API testing.
+4. Allows writing tests in a human-readable tabular format.
+5. Extensible and widely used in both acceptance testing and automation testing scenarios.
+
+
+
+-----Conclusion-----
+-PyUnit and Pytest are primarily for unit and functional testing.
+--Behave is for Behavior-Driven Development and feature testing.
+---Splinter focuses on automating web application testing.
+----Robot Framework is suitable for acceptance testing and test automation using a keyword-driven approach.
+-----The choice of tool depends on your specific testing needs and preferences, as well as the type of testing 
+     you are conducting in your project.

@@ -75,13 +75,16 @@ Future updates and learning milestones will be added here.
 
 # Resources
 
- # [1] 
+# [1]
+
     Programming QuickStart Guides Bundle by Robert Oliver - My primary learning resource.
 
- # [2] 
+# [2]
+
     Python.org - Official Python documentation and tutorials.
-    
- # [3] - Other Resources
+
+# [3] - Other Resources
+
     1. Python Tutorial - Python Full Course for Beginners - Programming with Mosh -
     https://www.youtube.com/watch?v=_uQrJ0TkZlc
 
