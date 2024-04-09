@@ -8,7 +8,7 @@
 # [10, 343445353, 3453445, 3453545353453] should return 3453455.
 
 # -------------------------------------------------------------------------------------
-# -----Solution 1-----
+# -----Solution 1-----Slice-----
 def sum_two_smallest_numbers(numbers):
     return sum(sorted(numbers)[:2])
 #   1. sorts input array in ascending order.
@@ -16,7 +16,7 @@ def sum_two_smallest_numbers(numbers):
 #   3. sum first two numbers and return result.
 
 # -------------------------------------------------------------------------------------
-# -----Solution 2-----
+# -----Solution 2-----Sort-----
 def sum_two_smallest_numbers(num_list):
     num_list.sort()
     return num_list[0] + num_list[1]

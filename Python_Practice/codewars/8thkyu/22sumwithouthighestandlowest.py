@@ -15,7 +15,7 @@
 # only 1 element, return 0.
 
 # -------------------------------------------------------------------------------------
-# -----Solution 1-----
+# -----Solution 1-----Conditional Statements-----
 def sum_array(arr):
     if arr == None or len(arr) < 3:
         return 0  # Handles input validation condition
@@ -28,7 +28,7 @@ def sum_array(arr):
 #   5. If input array is None or has less than 3 elements, it returns 0 as per input validation.
 
 # -------------------------------------------------------------------------------------
-# -----Solution 2-----
+# -----Solution 2-----Slice-----
 def sum_array(arr):
     return sum(sorted(arr)[1:-1]) if arr len(arr) > 1 else 0
 

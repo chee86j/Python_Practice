@@ -22,7 +22,7 @@
 # * Input: [2,2,1,2,1], output = [2,2,2,1]
 
 # -------------------------------------------------------------------------------------
-# -----Solution 1-----
+# -----Solution 1-----Slicing-----
 def remove_smallest(numbers):
     a = numbers[:]
     if a:
@@ -34,7 +34,7 @@ def remove_smallest(numbers):
 #   4. remove smallest element from copied array.
 
 # -------------------------------------------------------------------------------------
-# -----Solution 2-----
+# -----Solution 2-----Index-----
 def remove_smallest(numbers):
     if len(numbers) < 1: 
         return numbers
