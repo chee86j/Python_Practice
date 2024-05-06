@@ -21,12 +21,15 @@
 # Attention: If the number has leading zeros the 
 # amount of digits should be considered.
 
-# -----Solution 1-----
+# -----Solution 1-----rstrip() & zfill()-----
 def increment_string(strng):
     head = strng.rstrip('0123456789')
+# rstrip() returns a copy of the string w/ trailing characters removed
     tail = strng[len(head):]
     if tail == "": return strng+"1"
     return head + str(int(tail) + 1).zfill(len(tail))
+# zfill() returns a copy of the string w/ '0' characters padded to the 
+# left side of the string
 
 #   1. Set head w/ strng w/o numbers at the end
 #   2. Set tail w/ strng from length of head to the end
@@ -38,7 +41,7 @@ def increment_string(strng):
 #   This solution is more efficient than Solution 2 below because it uses an 
 #   if statement instead of two if statements
 
-# -----Solution 2-----
+# -----Solution 2-----rstrip() & zfill() & (2) if Statements-----
 def increment_string(strng):
     stripped = strng.rstrip('1234567890')
     ints = strng[len(stripped):]
