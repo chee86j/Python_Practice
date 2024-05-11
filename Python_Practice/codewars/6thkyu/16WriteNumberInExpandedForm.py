@@ -53,3 +53,25 @@ def expanded_form(n):
 #   5.  If the quotient is not 0, append the quotient multiplied by current
 #       to the result list
 #   6.  Return a string that joins the result list with a '+' sign
+
+
+
+# -------------------------------------------------------------------------------------
+# -----Javascript Solution-----
+# const expandedForm = n => n.toString()
+#                             .split("")
+#                             .reverse()
+#                             .map( (a, i) => a * Math.pow(10, i))
+#                             .filter(a => a > 0)
+#                             .reverse()
+#                             .join(" + ");
+
+#   1.  Convert the number to a string
+#   2.  Split the string into an array of characters
+#   3.  Reverse the array
+#   4.  Map through the array and multiply the character by 10 to the power of
+#       the index
+#   5.  Filter out the numbers that are less than or equal to 0
+#   6.  Reverse the array
+#   7.  Join the array with a '+' sign
+#   8.  Return the joined array
