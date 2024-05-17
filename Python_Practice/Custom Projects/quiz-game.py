@@ -1,3 +1,5 @@
+import random
+
 # Dictionary of questions, options, and answers
 questions = [
     {
@@ -54,16 +56,42 @@ questions = [
 
 def run_quiz(questions):
     score = 0
+    lifelines = 3 # lifelines to randomly eliminate 2 wrong answers
     for question in questions:
         print(question['prompt']) # prompt is used in python to display a message to the user
+        
+        options = question['options'] 
+        
         for option in question['options']:
             print(option)
+        print()
+            
+        # lifeline feature
+        if lifelines > 0:
+            print('Lifelines remaining:', lifelines)
+            lifeline = input('Would you like to use a Lifeline? (Y/N): ').upper()
+            print()
+            if lifeline == 'Y':
+                print('Using lifeline...')
+                correct_answer = next(option for option in options if option.startswith(question['answer'] + '.'))
+                incorrect_options = [opt for opt in options if opt != correct_answer]
+                options_to_remove = random.sample(incorrect_options, min(2, len(incorrect_options)))
+                for opt in options_to_remove:
+                    options.remove(opt)
+                for opt in options:
+                    print(f"Remaining option: {opt}")
+                lifelines -= 1
+                
         answer = input('Enter Your Answer (A, B, C, D): ').upper()
         if answer == question['answer']:
             print('Correct!\n')
             score += 1
+            print()
         else:
             print('Incorrect!')
+            print()
     print(f'You got {score} out of {len(questions)} questions right!\n') # f-string formatting is similar to JS template literals
                 
 run_quiz(questions)
+
+# To execute the code, run the command 'python3 quiz-game.py' in the terminal
