@@ -32,3 +32,16 @@ def number(lines):
 #   This solution is similar to first solution but uses f-strings for string formatting
 #   The f-string is used to format string with line number and line
 #   It is enclosed in curly braces and variables are inserted inside curly braces
+
+# -------------------------------------------------------------------------------------
+# -----Solution 3-----Javascript Solution-----
+# var number = function(array) {
+#   return array.map(function (line, index) {
+#     return (index + 1) + ": " + line;
+#   });
+# }
+
+#   1.  Use the map method to iterate over the array of lines
+#   2.  For each line, return the line number and line as a formatted string
+#   3.  The line number is the index incremented by 1
+#   4.  Return the array of formatted strings
