@@ -12,7 +12,7 @@
 # More details about factorial can be found here.
 
 # -------------------------------------------------------------------------------------
-# -----Solution 1-----
+# -----Solution 1-----Recursion & ValueError-----
 def factorial(n):
     if n < 0 or n > 12:
         raise ValueError
@@ -27,7 +27,7 @@ def factorial(n):
 #     For example, if n is 5, the function will return 5 * 4 * 3 * 2 * 1 = 120.
 
 # -------------------------------------------------------------------------------------
-# -----Solution 2-----Javascript Solution-----
+# -----Solution 2-----Javascript Solution-----RangeError & Recursion-----
 # function factorial(n) {
 #     if (n < 0 || n > 12) {
 #         throw new RangeError();
