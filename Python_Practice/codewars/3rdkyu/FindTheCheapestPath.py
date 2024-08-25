@@ -50,7 +50,7 @@
 
 
 # -------------------------------------------------------------------------------------
-# -----Solution 1----
+# -----Solution 1----DFS or BFS w/o Priority Queue----
 from heapq import *
 
 # Direction vectors for moving in a grid & their corresponding names.
@@ -125,7 +125,7 @@ def cheapest_path(t, start, finish):
 #     This solution is efficient & easy to underst&.
 
 # -------------------------------------------------------------------------------------
-# -----Solution 2----
+# -----Solution 2----Implementing A* Search Algorithm----
 import heapq
 
 
@@ -230,7 +230,7 @@ def printPath(cameFromDict, start, finish):
 
 
 def cheapest_path(t, start, finish):
-    grid = Gridw/Weights(t)
+    grid = GridWithWeights(t)
     came_from, cost_so_far = a_star_search(grid, start, finish)
     return printPath(came_from, start, finish)
 #  1. Define a class PriorityQueue w/ methods to initialize, check if empty, add an item w/ a priority, & get the item w/ the lowest priority.
@@ -241,19 +241,19 @@ def cheapest_path(t, start, finish):
 #  6. Define a function to find the directions from the start to the finish node.
 #  7. Define a function to print the path from the start to the finish node.
 #  8. Define the function cheapest_path which takes the toll_map matrix t, the start coordinate start, & the finish coordinate finish as input.
-#  9. Create a grid object from the toll map. `grid = Gridw/Weights(t)`
+#  9. Create a grid object from the toll map. `grid = GridWithWeights(t)`
 # 10. Perform an A* search to find the shortest path. `came_from, cost_so_far = a_star_search(grid, start, finish)`
 # 11. Print the path from the start to the finish node. `return printPath(came_from, start, finish)`
 # 12. This solution uses the A* search algorithm to find the shortest path from the start to the finish node. 
 #     It has a time complexity of O(n log n) where n is the number of nodes in the grid & a space complexity of O(n) as well.
-#     Compared to simpler or more brute-force methods, this solution is highly efficient in both time and space for larger grids or more complex cost structures. 
-#     It allows for early exits and optimal pathfinding with the potential to handle varied and complex heuristic functions. The use of well-defined classes and 
+#     Compared to simpler or more brute-force methods, this solution is highly efficient in both time & space for larger grids or more complex cost structures. 
+#     It allows for early exits & optimal pathfinding with the potential to handle varied & complex heuristic functions. The use of well-defined classes & 
 #     methods also enhances maintainability, making it easier to update or modify the grid or cost logic without affecting the pathfinding mechanics directly.
 #     This A* implementation is a strong choice for problems where the pathfinding needs to consider multiple factors (like different movement costs),
 #     and the grid size can become significantly large, making naive solutions impractical.
 
 # -------------------------------------------------------------------------------------
-# -----Solution 3----
+# -----Solution 3----Dijkstra's Algorithm w/ Priority Queue----
 import heapq
 
 def cheapest_path(matrix, start, finish):
@@ -272,9 +272,28 @@ def cheapest_path(matrix, start, finish):
                 heapq.heappush(queue, (matrix[x][y] + value, (x, y), dirs + [dir]))
             seen[x, y] = 1
     return []
+#  1. Define the function cheapest_path which takes the toll_map matrix t, 
+#     the start coordinate start, & the finish coordinate finish as input.
+#  2. If the start & finish coordinates are the same, return an empty list.
+#  3. Initialize a dictionary seen to track visited nodes, the length of the matrix,
+#     the length of a row in the matrix, & a priority queue queue w/ the start position & an empty list of directions.
+#  4. Process nodes until the queue is empty.
+#  5. Pop the node w/ the lowest cost from the queue.
+#  6. Explore all possible movements from the current position.
+#  7. Calculate the new position & the cost to reach it.
+#  8. If the new position is the finish, return the directions list.
+#  9. If the new position is w/in the grid & has not been visited, add it to the queue.
+# 10. Mark the new position as visited.
+# 11. If no path was found, return an empty list.
+# 12. This solution uses a priority queue to explore the grid & find the path w/ the lowest cost.
+#     It has a time complexity of O(n * log(n)) where n is the number of nodes in the grid & a space 
+#     complexity of O(n) as well. It is quite optimal for scenarios w/ variable traversal costs, which
+#     is essential for the problem at hand. It is between the simplicity of the BFS (1st solution) & the optimized
+#     A* algorithm (2nd solution), providing a good balance between efficiency & complexity.
+
 
 # -------------------------------------------------------------------------------------
-# -----Solution 4----
+# -----Solution 4----Modified Dijkstra's Algorithm w/ Priority Queue----
 DIRS = {(0, 1): 'right', (1, 0): 'down', (0, -1): 'left', (-1, 0): 'up'}
 
 def cheapest_path(grid, start, finish):
@@ -296,3 +315,30 @@ def cheapest_path(grid, start, finish):
         path.append(DIRS[x1 - x0, y1 - y0])
         pos = prev[pos]
     return path[::-1]
+#  1. Define the direction vectors for moving in a grid & their corresponding names. 
+#     `DIRS = {(0, 1): 'right', (1, 0): 'down', (0, -1): 'left', (-1, 0): 'up'}`
+#  2. Define the function cheapest_path which takes the toll_map matrix t, the start 
+#     coordinate start, & the finish coordinate finish as input.
+#  3. Get the dimensions of the toll map. `h, w = len(grid), len(grid[0])`
+#  4. Initialize a dictionary prev to track the previous node & a dictionary bag to 
+#     track the cost to reach a node.
+#  5. Process nodes until the bag is empty.
+#  6. Get the position w/ the lowest cost from the bag.
+#  7. If the position is the finish, break the loop.
+#  8. Calculate the cost to reach the current position.
+#  9. Explore all possible movements from the current position.
+# 10. Calculate the new position & the cost to reach it.
+# 11. If the new position is not w/in the grid, continue to the next movement.
+# 12. If the new position is already visited & not in the bag, continue to the next movement.
+# 13. If the cost to reach the new position is less than the current cost, update the cost in the bag.
+# 14. Backtrack from the finish to build the path list.
+# 15. Append the movement to the path list.
+# 16. Update the current position.
+# 17. Return the reversed path.
+# 18. This solution uses a priority queue to explore the grid & backtracks from the finish to build the path list.
+#     It has a time complexity of O(n * log(n)) where n is the number of nodes in the grid & a space complexity of O(n) as well.
+#     It is a modified version of Dijkstra's algorithm that uses a priority queue to find the path w/ the lowest cost. Its manual 
+#     priority queue management using a dictionary is less efficient than the heapq-based priority queue in the 3rd solution, 
+#     but it is still a viable approach for this problem. For larger grids or more complex scenarios, the manual approach might 
+#     lead to slower performance due to less efficient priority queue operations. Using heapq or implementing a more standard 
+#     priority queue might enhance both performance & readability.
