@@ -1,5 +1,5 @@
 # Import Necessary Modules
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout, QWidget
 
 class TicTacToe(QMainWindow):
     def __init__(self):
@@ -12,7 +12,7 @@ class TicTacToe(QMainWindow):
         # Central widget & layout
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        layout = QVBoxLayout()
+        layout = QGridLayout()  # Use a grid layout for the buttons
         
         # Initialize a Grid to hold button references organized in a 3x3 matrix
         self.buttons = []
@@ -24,7 +24,7 @@ class TicTacToe(QMainWindow):
                 # Connect button click to the handler w/ parameters x and y
                 button.clicked.connect(lambda _, x=i, y=j: self.on_button_clicked(x, y))
                 row.append(button)
-                layout.addWidget(button)  # Add the button to the layout
+                layout.addWidget(button, i, j)  # Add the button to the grid layout at position (i, j)
             self.buttons.append(row)
         
         self.central_widget.setLayout(layout)  # Apply the layout to the central widget
@@ -71,3 +71,7 @@ app = QApplication([])
 window = TicTacToe()
 window.show()
 app.exec()
+
+# To run this code, you need to have Python & PyQt6 installed by running the following commands:
+# `pip install PyQt6` or `pip3 install PyQt6` or `pipenv install PyQt6` if you're using pipenv to manage dependencies.
+# Then, you can run the script using the command `python tictactoe.py` or `python3 tictactoe.py`.
