@@ -1,5 +1,5 @@
 # Import Necessary Modules
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout, QWidget, QVBoxLayout
 
 class TicTacToe(QMainWindow):
     def __init__(self):
@@ -7,12 +7,14 @@ class TicTacToe(QMainWindow):
         self.setWindowTitle("Tic Tac Toe")  # Window Title
         self.current_player = "X"  # Initialize the starting player
         self.initUI()  # Call the method to set up the user interface
-    
+
     def initUI(self):
         # Central widget & layout
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        layout = QGridLayout()  # Use a grid layout for the buttons
+        # Create a vertical layout to include both the grid & the restart button
+        main_layout = QVBoxLayout()
+        grid_layout = QGridLayout()  # Use a grid layout for the buttons
         
         # Initialize a Grid to hold button references organized in a 3x3 matrix
         self.buttons = []
@@ -24,10 +26,16 @@ class TicTacToe(QMainWindow):
                 # Connect button click to the handler w/ parameters x and y
                 button.clicked.connect(lambda _, x=i, y=j: self.on_button_clicked(x, y))
                 row.append(button)
-                layout.addWidget(button, i, j)  # Add the button to the grid layout at position (i, j)
+                grid_layout.addWidget(button, i, j)  # Add the button to the grid layout at position (i, j)
             self.buttons.append(row)
         
-        self.central_widget.setLayout(layout)  # Apply the layout to the central widget
+        # Add restart button below the grid
+        self.restart_button = QPushButton("Restart")
+        self.restart_button.clicked.connect(self.restart_game)  # Connect the restart button to its handler
+        main_layout.addLayout(grid_layout)  # Add the grid layout to the main layout
+        main_layout.addWidget(self.restart_button)  # Add the restart button to the main layout
+
+        self.central_widget.setLayout(main_layout)  # Apply the main layout to the central widget
 
     def on_button_clicked(self, x, y):
         # Handle a button click at position (x, y)
@@ -39,7 +47,15 @@ class TicTacToe(QMainWindow):
                 self.end_game("It's a draw!")
             else:  # Change the player
                 self.current_player = "O" if self.current_player == "X" else "X"
-    
+
+    def restart_game(self):
+        # Reset the game state
+        for row in self.buttons:
+            for button in row:
+                button.setText(" ")
+                button.setEnabled(True)
+        self.current_player = "X"  # Reset the starting player
+
     def check_winner(self):
         # Check rows, columns, & diagonals for a winning pattern
         for i in range(3):
