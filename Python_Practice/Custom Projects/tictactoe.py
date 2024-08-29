@@ -55,14 +55,40 @@ class TicTacToe(QMainWindow):
                 self.switch_player()
                 self.ai_move()
 
-    # AI Random Move
+    # AI Algorithm To Block Human Win
     def ai_move(self):
-        available_moves = [(i, j) for i in range(3) for j in range(3) if self.buttons[i][j].text() == " "]
-        if available_moves:
-            x, y = random.choice(available_moves) # Randomly select an available move
-            self.buttons[x][y].setText(self.current_player)
-            if not self.check_game_over():  # Check if the game is over after AI move
-                self.switch_player()
+        x, y = self.find_best_move()
+        self.buttons[x][y].setText(self.current_player)
+        if not self.check_game_over():  # Check if the game is over after AI move
+            self.switch_player()
+            
+    # Checks if placing a mark at a given position results in a win & if not, returns the position to block the human win
+    
+    def find_best_move(self):
+        # Check for possible win or block needed
+        for is_ai in [True, False]:  # First check for AI win, then for human win to block
+            for i in range(3):
+                for j in range(3):
+                    if self.buttons[i][j].text() == " ": # Check if space is empty
+                        self.buttons[i][j].setText("O" if is_ai else "X") # Set the text to AI or Human
+                        if self.check_winner(): # Check if the move results in a win
+                            self.buttons[i][j].setText(" ") # Reset the button text
+                            return i, j  # Return winning/blocking move
+                        self.buttons[i][j].setText(" ") # Reset the button text
+        
+        # After immediate win/block moves, check for other strategies w/ Center > Corners > Random
+        if self.buttons[1][1].text() == " ": # Check if the center is empty
+            return 1, 1 # Return the center position
+        
+        # Prefer corners if available
+        corners = [(0, 0), (0, 2), (2, 0), (2, 2)] # List of corner positions
+        available_corners = [(i, j) for i, j in corners if self.buttons[i][j].text() == " "] # Check for empty corners
+        if available_corners: # If there are empty corners
+            return random.choice(available_corners) # Return a random corner
+        
+        # Random fallback for any other empty spaces
+        available_moves = [(i, j) for i in range(3) for j in range(3) if self.buttons[i][j].text() == " "] # Check for empty spaces
+        return random.choice(available_moves) if available_moves else (None, None) # Return a random empty space or None
 
     def switch_player(self):
         self.current_player = "O" if self.current_player == "X" else "X"
