@@ -1,6 +1,7 @@
 # Import Necessary Modules
 import random
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout, QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout, QWidget, QVBoxLayout, QLabel
+from PyQt6.QtCore import Qt
 
 class TicTacToe(QMainWindow):
     def __init__(self):
@@ -8,6 +9,7 @@ class TicTacToe(QMainWindow):
         self.setWindowTitle("Tic Tac Toe")  # Window Title
         self.current_player = "X"  # Human always starts
         self.is_human_turn = True  # Track if it's human's turn
+        self.scores = {'Human': 0, 'AI': 0}  # Track scores for human & AI
         self.initUI()  # Call the method to set up the user interface
 
     def initUI(self):
@@ -31,9 +33,15 @@ class TicTacToe(QMainWindow):
                 grid_layout.addWidget(button, i, j)  # Add the button to the grid layout at position (i, j)
             self.buttons.append(row)
         
+        # Add a label to display the scores
+        self.score_label = QLabel("Human: 0, AI: 0")  # Score label to display scores
+        self.score_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
         # Add restart button below the grid
         self.restart_button = QPushButton("Restart")
         self.restart_button.clicked.connect(self.restart_game)  # Connect the restart button to its handler
+        
+        main_layout.addWidget(self.score_label) # Add the score label to the main layout
         main_layout.addLayout(grid_layout)  # Add the grid layout to the main layout
         main_layout.addWidget(self.restart_button)  # Add the restart button to the main layout
 
@@ -61,13 +69,19 @@ class TicTacToe(QMainWindow):
         self.is_human_turn = not self.is_human_turn
 
     def check_game_over(self):
-        if self.check_winner():  # Check for a win
+        if self.check_winner():
+            winner = "Human" if self.current_player == "X" else "AI"
+            self.scores[winner] += 1  # Update scores based on winner
+            self.update_score_label()
             self.end_game(f"Player {self.current_player} wins!")
             return True
-        elif self.is_draw():  # Check for a draw
+        elif self.is_draw():
             self.end_game("It's a draw!")
             return True
         return False
+
+    def update_score_label(self):
+        self.score_label.setText(f"Human: {self.scores['Human']}, AI: {self.scores['AI']}")
 
     def restart_game(self):
         # Reset the game state
