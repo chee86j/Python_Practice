@@ -1,11 +1,13 @@
 # Import Necessary Modules
+import random
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout, QWidget, QVBoxLayout
 
 class TicTacToe(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Tic Tac Toe")  # Window Title
-        self.current_player = "X"  # Initialize the starting player
+        self.current_player = "X"  # Human always starts
+        self.is_human_turn = True  # Track if it's human's turn
         self.initUI()  # Call the method to set up the user interface
 
     def initUI(self):
@@ -15,7 +17,7 @@ class TicTacToe(QMainWindow):
         # Create a vertical layout to include both the grid & the restart button
         main_layout = QVBoxLayout()
         grid_layout = QGridLayout()  # Use a grid layout for the buttons
-        
+
         # Initialize a Grid to hold button references organized in a 3x3 matrix
         self.buttons = []
         for i in range(3):  # Loop for each row
@@ -40,13 +42,32 @@ class TicTacToe(QMainWindow):
     def on_button_clicked(self, x, y):
         # Handle a button click at position (x, y)
         if self.buttons[x][y].text() == " ":  # Check if the button is still empty
-            self.buttons[x][y].setText(self.current_player)  # Set the button to the current player's symbol
-            if self.check_winner():  # Check for a win
-                self.end_game(f"Player {self.current_player} wins!")
-            elif self.is_draw():  # Check for a draw
-                self.end_game("It's a draw!")
-            else:  # Change the player
-                self.current_player = "O" if self.current_player == "X" else "X"
+            self.buttons[x][y].setText(self.current_player)
+            if not self.check_game_over():
+                self.switch_player()
+                self.ai_move()
+
+    # AI Random Move
+    def ai_move(self):
+        available_moves = [(i, j) for i in range(3) for j in range(3) if self.buttons[i][j].text() == " "]
+        if available_moves:
+            x, y = random.choice(available_moves) # Randomly select an available move
+            self.buttons[x][y].setText(self.current_player)
+            if not self.check_game_over():  # Check if the game is over after AI move
+                self.switch_player()
+
+    def switch_player(self):
+        self.current_player = "O" if self.current_player == "X" else "X"
+        self.is_human_turn = not self.is_human_turn
+
+    def check_game_over(self):
+        if self.check_winner():  # Check for a win
+            self.end_game(f"Player {self.current_player} wins!")
+            return True
+        elif self.is_draw():  # Check for a draw
+            self.end_game("It's a draw!")
+            return True
+        return False
 
     def restart_game(self):
         # Reset the game state
@@ -55,6 +76,7 @@ class TicTacToe(QMainWindow):
                 button.setText(" ")
                 button.setEnabled(True)
         self.current_player = "X"  # Reset the starting player
+        self.is_human_turn = True
 
     def check_winner(self):
         # Check rows, columns, & diagonals for a winning pattern
