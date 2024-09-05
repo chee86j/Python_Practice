@@ -9,6 +9,7 @@ from PySide6.QtGui import QFont
 class AdvancedCalculator(QWidget):
     def __init__(self):
         super().__init__()
+        self.history = []
         self.init_ui()
 
     def init_ui(self):
@@ -36,7 +37,8 @@ class AdvancedCalculator(QWidget):
             '1', '2', '3', '-',
             '0', '.', '=', '+',
             'sqrt', 'pow', 'log', 'ln',
-            'sin', 'cos', 'tan', 'exp'
+            'sin', 'cos', 'tan', 'exp',
+            'History'
         ]
         
         # Create a grid layout for buttons
@@ -65,9 +67,12 @@ class AdvancedCalculator(QWidget):
                 # Evaluate the expression and set the result to the display
                 result = self.evaluate_expression(current_text)
                 self.display.setText(str(result))
+                self.history.append(current_text + ' = ' + str(result))
             except Exception as e:
                 # Show an error message if there is an exception
                 QMessageBox.critical(self, 'Error', 'Invalid Input')
+        elif button_text == 'History':
+            self.show_history() # Show the history of calculations
         else:
             # Append the button text to the current display text
             new_text = current_text + button_text
