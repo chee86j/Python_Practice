@@ -160,5 +160,4 @@ def primeFactors(n):
 #   to find the prime factors of n. It has a space complexity of O(1) because it uses a
 #   constant amount of extra space to store the result str. This solution is more
 #   efficient than solution 1 because it generates the result str directly, rather than
-#   storing intermediate results. This is probably the most efficient solution for this
-#   problem because it stops iterating early when possible.
+#   storing intermediate results. This is probably the most efficient solution because it stops iterating early when possible.
