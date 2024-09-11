@@ -102,5 +102,4 @@ def sum_pairs(ints, s):
 #   the numbers in the list with respect to the sum. It iterates through the numbers in the list & 
 #   checks whether the complement of the current number is in the set. If it is, it returns the pair
 #   immediately. If no pair is found, it returns undefined. This solution has the same time & space
-#   complexity as the Python solutions. It is also efficient for large lists of numbers because it only
-#   requires a single pass through the list.
+#   complexity as the Python solutions. 
