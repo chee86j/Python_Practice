@@ -35,6 +35,7 @@ def predict_age(*ages):
 #   a few variables. This solution is efficient for predicting the age based on the
 #   formula provided. It uses a generator expression to calculate the sum of the squares
 #   of all ages in the list.
+#   This solution is best when you want to write less code and prefer a simple and clean one-liner.
 
 # -------------------------------------------------------------------------------------
 # -----Solution 2-----
@@ -57,6 +58,7 @@ def predict_age(age_1, age_2, age_3, age_4, age_5, age_6, age_7, age_8):
 #   variables. This solution is efficient for predicting the age based on the formula
 #   provided. It uses a list comprehension to calculate the sum of the squares of all
 #   ages in the list `arr`.
+#   This is more verbose and easier to follow for beginners.
 
 # -------------------------------------------------------------------------------------
 # -----Solution 3-----Javascript Solution-----
@@ -75,3 +77,4 @@ def predict_age(age_1, age_2, age_3, age_4, age_5, age_6, age_7, age_8):
 #  variables. This solution is efficient for predicting the age based on the formula
 #  provided. It uses the map & reduce methods to calculate the sum of the squares of all
 #  ages in the list `arr`.
+#  If you are comfortable with Javascript array methods, this solution is very readable.
