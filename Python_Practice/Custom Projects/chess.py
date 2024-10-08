@@ -30,15 +30,44 @@ def render_chessboard(board):
     board_img = pygame.image.load(png_data)
     return pygame.transform.scale(board_img, (WIDTH, HEIGHT))
 
+# Start Menu Function to choose between AI and PvP (on the same device)
+def start_menu():
+    font = pygame.font.Font(None, 74)
+    running = True
+    while running:
+        WIN.fill(WHITE)
+        title_text = font.render("Chess Game", True, BLACK)
+        play_ai_text = font.render("Play AI", True, BLACK)
+        play_pvp_text = font.render("Play PvP", True, BLACK)
+        WIN.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, HEIGHT // 4))
+        WIN.blit(play_ai_text, (WIDTH // 2 - play_ai_text.get_width() // 2, HEIGHT // 2 - 50))
+        WIN.blit(play_pvp_text, (WIDTH // 2 - play_pvp_text.get_width() // 2, HEIGHT // 2 + 50))
+        pygame.display.update()
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if play_ai_text.get_rect(topleft=(WIDTH // 2 - play_ai_text.get_width() // 2, HEIGHT // 2 - 50)).collidepoint(pos):
+                    return "ai"
+                elif play_pvp_text.get_rect(topleft=(WIDTH // 2 - play_pvp_text.get_width() // 2, HEIGHT // 2 + 50)).collidepoint(pos):
+                    return "pvp"
+
 # Main Game Function
 def main():
     clock = pygame.time.Clock()
     board = chess.Board()
     selected_square = None
     running = True
+    player_mode = start_menu()
 
-    # Set up Stockfish chess engine for AI
-    engine = chess.engine.SimpleEngine.popen_uci("/path/to/stockfish") # Remember to replace w/ Stockfish executable path
+    # Set up chess engine if playing against AI
+    engine = None
+    if player_mode == "ai":
+        # Set up Stockfish chess engine for AI
+        engine = chess.engine.SimpleEngine.popen_uci("/path/to/stockfish") # Remember to replace w/ Stockfish executable path
     
     while running:
         clock.tick(FPS)
@@ -56,7 +85,7 @@ def main():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 row, col = pos[1] // SQUARE_SIZE, pos[0] // SQUARE_SIZE
-                square = chess.square(col, 7 - row)
+                square = chess.square(col, 7 - row) if board.turn == chess.WHITE else chess.square(7 - col, row)
                 if selected_square is None:
                     if board.piece_at(square) and board.piece_at(square).color == board.turn:
                         selected_square = square
@@ -64,13 +93,16 @@ def main():
                     move = chess.Move(selected_square, square)
                     if move in board.legal_moves:
                         board.push(move)
-                        # AI makes a move immediately after player's move
-                        if not board.is_game_over():
+                        selected_square = None
+                        # AI makes a move after player if in AI mode
+                        if player_mode == "ai" and not board.is_game_over() and board.turn == chess.BLACK:
                             result = engine.play(board, chess.engine.Limit(time=1.0))
                             board.push(result.move)
-                    selected_square = None
-    
-    engine.quit()
+                    else:
+                        selected_square = None
+
+    if engine:
+        engine.quit()
     pygame.quit()
 
 if __name__ == "__main__":
