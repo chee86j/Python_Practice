@@ -1,13 +1,13 @@
 # Backend Logic test cases for core functionality like saving/loading games, 
-# board state, and game flow logic. 
+# board state, & game flow logic. 
 
 import pytest
 import chess
 from chess_game_ui import save_game, load_game, start_menu, game_over_screen
 
-# Test saving and loading the game
+# Test saving & loading the game
 def test_save_and_load_game():
-    # Create a board and make some moves
+    # Create a board & make some moves
     board = chess.Board()
     board.push(chess.Move.from_uci("e2e4"))
     board.push(chess.Move.from_uci("e7e5"))
@@ -58,7 +58,7 @@ def test_start_menu():
 
 # Test game over screen functionality
 def test_game_over_screen():
-    # Similar to start_menu, we can't directly test Pygame UI here, but we ensure the function exists and is callable
+    # Similar to start_menu, we can't directly test Pygame UI here, but we ensure the function exists & is callable
     assert callable(game_over_screen)
 
 
@@ -66,3 +66,10 @@ def test_game_over_screen():
 # Go to the directory `cd Python_Practice/Custom%20Projects/Chess``
 # Install dependencies by running `pip install pytest pygame chess cairosvg``
 # Run in the terminal `pytest test_chess.py` or `python -m pytest test_chess.py` if the first command doesn't work.
+
+# Note test are run on the backend logic of the chess game, not the UI due to
+# the complexity of testing UI with Pygame. The tests cover core functionality
+# like saving/loading games, board state, & game flow logic. The tests ensure
+# that the game behaves correctly under different conditions & that the core
+# logic is functioning as expected. The tests help identify bugs & issues in
+# the game logic & ensure that the game is stable & reliable. 
