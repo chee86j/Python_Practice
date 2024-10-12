@@ -3,7 +3,7 @@
 
 import pytest
 import chess
-from chess_game_ui import save_game, load_game, start_menu, game_over_screen
+from chess import save_game, load_game, start_menu, game_over_screen
 
 # Test saving & loading the game
 def test_save_and_load_game():

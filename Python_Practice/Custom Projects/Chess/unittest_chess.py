@@ -1,7 +1,11 @@
 # Unittests aka PyUnit version for testing the Chess game
 import unittest
 import chess
-from chess_game_ui import save_game, load_game, start_menu, game_over_screen
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from chess import save_game, load_game, start_menu, game_over_screen
 import os
 
 class TestChessGame(unittest.TestCase):
