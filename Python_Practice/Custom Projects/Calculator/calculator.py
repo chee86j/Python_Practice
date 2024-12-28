@@ -81,13 +81,15 @@ class AdvancedCalculator(QWidget):
     def evaluate_expression(self, expression):
         # Function Names are Replace with Math Module Functions
         expression = expression.replace('sqrt', 'math.sqrt')
-        expression = expression.replace('pow', '**')
         expression = expression.replace('log', 'math.log10')
         expression = expression.replace('ln', 'math.log')
         expression = expression.replace('sin', 'math.sin')
         expression = expression.replace('cos', 'math.cos')
         expression = expression.replace('tan', 'math.tan')
         expression = expression.replace('exp', 'math.exp')
+        
+        # Do not replace pow with **; allow math.pow to handle it
+        expression = expression.replace('pow', 'math.pow')
         
         # Evaluate the expression
         return eval(expression)
