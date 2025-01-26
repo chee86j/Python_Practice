@@ -35,7 +35,7 @@ class ChessGUI(QMainWindow):
         self.setWindowTitle("Chess Game")
         self.setFixedSize(QSize(800, 800))
         self.board = chess.Board()
-        stockfish_path = "c:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish chess engine/stockfish-windows-x86-64-avx2.exe"
+        stockfish_path = "c:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish-chess-engine/stockfish-windows-x86-64-avx2.exe"
         self.engine = Stockfish(path=stockfish_path)
         self.initUI()
         self.selected_square = None
