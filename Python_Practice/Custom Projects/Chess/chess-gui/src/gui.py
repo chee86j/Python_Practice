@@ -89,7 +89,8 @@ class ChessGUI(QMainWindow):
         
         # Initialize Stockfish
         try:
-            stockfish_path = "c:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe"
+            # stockfish_path = "c:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe"
+            stockfish_path = "/usr/local/bin/stockfish"  # Update path for macOS Homebrew installation of Stockfish
             if not os.path.exists(stockfish_path):
                 raise FileNotFoundError(f"Stockfish not found at: {stockfish_path}")
             
