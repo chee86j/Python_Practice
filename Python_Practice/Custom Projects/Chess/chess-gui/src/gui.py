@@ -2,10 +2,10 @@ import sys
 import os
 import pygame
 from pygame.locals import *
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QGridLayout, QPushButton, 
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QPushButton, 
                             QWidget, QMessageBox, QVBoxLayout, QDialog, QLabel)
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QIcon, QFont, QPalette, QColor
+from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtGui import QIcon, QFont, QPalette, QColor
 import chess
 from stockfish import Stockfish
 
@@ -42,13 +42,13 @@ class GameOverDialog(QDialog):
         
         # Message label
         message_label = QLabel(message)
-        message_label.setAlignment(Qt.AlignCenter)
+        message_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(message_label)
         
         # Restart button
         restart_button = QPushButton("Play Again")
         restart_button.clicked.connect(self.accept)
-        layout.addWidget(restart_button, alignment=Qt.AlignCenter)
+        layout.addWidget(restart_button, alignment=Qt.AlignmentFlag.AlignCenter)
         
         self.setLayout(layout)
 
@@ -84,13 +84,13 @@ class ChessGUI(QMainWindow):
                     print(f"Error loading image {image_path}: {e}")
 
         self.setWindowTitle("Chess Game")
-        self.setFixedSize(QSize(800, 800))
+        self.setFixedSize(800, 800)  # Direct size setting instead of QSize
         self.board = chess.Board()
         
         # Initialize Stockfish
         try:
-            # stockfish_path = "c:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe"
-            stockfish_path = "/usr/local/bin/stockfish"  # Update path for macOS Homebrew installation of Stockfish
+            stockfish_path = "c:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe"
+            # stockfish_path = "/usr/local/bin/stockfish"  # Update path for macOS Homebrew installation of Stockfish
             if not os.path.exists(stockfish_path):
                 raise FileNotFoundError(f"Stockfish not found at: {stockfish_path}")
             
@@ -118,7 +118,7 @@ class ChessGUI(QMainWindow):
         for i in range(8):
             for j in range(8):
                 button = QPushButton("")
-                button.setFixedSize(100, 100)
+                button.setFixedSize(QSize(100, 100))  # Explicit QSize for button
                 # Use class color constants
                 color = self.get_square_color(i, j)
                 button.setStyleSheet(f"""
@@ -262,7 +262,8 @@ class ChessGUI(QMainWindow):
                     
                     piece_image = os.path.join(self.pieces_path, f"{color}_{piece_type}.png")
                     if os.path.exists(piece_image):
-                        self.buttons[(i, j)].setIcon(QIcon(piece_image))
+                        icon = QIcon(piece_image)
+                        self.buttons[(i, j)].setIcon(icon)
                         self.buttons[(i, j)].setIconSize(QSize(80, 80))
                     else:
                         print(f"Missing image: {piece_image}")
@@ -282,11 +283,11 @@ class ChessGUI(QMainWindow):
             message = "Draw - Insufficient Material!"
         
         dialog = GameOverDialog(message, self)
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.restart_game()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ChessGUI()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())  # Note: exec() instead of exec_() in PyQt6
