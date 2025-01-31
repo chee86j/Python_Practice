@@ -1,11 +1,10 @@
 import sys
 import os
-import pygame
-from pygame.locals import *
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QPushButton, 
-                            QWidget, QMessageBox, QVBoxLayout, QDialog, QLabel)
+                            QWidget, QMessageBox, QVBoxLayout, QDialog, QLabel,
+                            QToolBar, QHBoxLayout)
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QIcon, QFont, QPalette, QColor
+from PyQt6.QtGui import QIcon
 import chess
 from stockfish import Stockfish
 
@@ -84,24 +83,47 @@ class ChessGUI(QMainWindow):
                     print(f"Error loading image {image_path}: {e}")
 
         self.setWindowTitle("Chess Game")
-        self.setFixedSize(800, 800)  # Direct size setting instead of QSize
+        self.setFixedSize(QSize(800, 800))
         self.board = chess.Board()
         
-        # Initialize Stockfish
-        try:
-            stockfish_path = "c:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe"
-            # stockfish_path = "/usr/local/bin/stockfish"  # Update path for macOS Homebrew installation of Stockfish
-            if not os.path.exists(stockfish_path):
-                raise FileNotFoundError(f"Stockfish not found at: {stockfish_path}")
-            
-            self.engine = Stockfish(path=stockfish_path)
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to initialize Stockfish engine: {str(e)}\n"
-                               "Please make sure Stockfish is installed in the correct location.")
+        # Initialize Stockfish with multiple possible paths
+        stockfish_paths = [
+            "/usr/local/bin/stockfish",  # macOS Homebrew
+            "/usr/bin/stockfish",        # Linux
+            "c:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
+            "stockfish"  # System PATH
+        ]
+
+        self.engine = None
+        for path in stockfish_paths:
+            try:
+                self.engine = Stockfish(path=path)
+                break
+            except Exception:
+                continue
+
+        if self.engine is None:
+            QMessageBox.critical(
+                self, 
+                "Stockfish Not Found",
+                "Could not find Stockfish chess engine. Please:\n\n"
+                "1. Install Stockfish:\n"
+                "   - Windows: Download from https://stockfishchess.org/\n"
+                "   - macOS: brew install stockfish\n"
+                "   - Linux: sudo apt install stockfish\n\n"
+                "2. Ensure it's in one of these locations:\n"
+                f"{chr(10).join(stockfish_paths)}"
+            )
             sys.exit(1)
 
+        # Add status label for turn indicator with dynamic styling
+        self.status_label = QLabel("Current Turn: White")
+        self.status_label.setMinimumWidth(200)  # Ensure consistent width
+        # Initial styling will be set by update_turn_indicator
+        
         self.initUI()
         self.create_toolbar()
+        self.update_turn_indicator()  # Initial update
 
     def get_square_color(self, i, j):  # Fix indentation
         return self.LIGHT_SQUARE if (i + j) % 2 == 0 else self.DARK_SQUARE
@@ -118,7 +140,7 @@ class ChessGUI(QMainWindow):
         for i in range(8):
             for j in range(8):
                 button = QPushButton("")
-                button.setFixedSize(QSize(100, 100))  # Explicit QSize for button
+                button.setFixedSize(100, 100)
                 # Use class color constants
                 color = self.get_square_color(i, j)
                 button.setStyleSheet(f"""
@@ -146,30 +168,103 @@ class ChessGUI(QMainWindow):
 
 
     def create_toolbar(self):
-        toolbar = self.addToolBar("Game Controls")
+        toolbar = QToolBar("Game Controls", self)
+        self.addToolBar(toolbar)
         toolbar.setMovable(False)
+
+        # Create widget to hold buttons and status
+        widget = QWidget()
+        layout = QHBoxLayout(widget)
         
+        # Add restart button
         restart_action = QPushButton("Restart Game")
-        restart_action.setStyleSheet("""
+        new_game_action = QPushButton("New Game")
+        
+        button_style = """
             QPushButton {
                 background-color: #2980B9;
                 color: white;
                 border: none;
                 padding: 8px 16px;
                 font-size: 14px;
+                margin-right: 10px;
             }
             QPushButton:hover {
                 background-color: #3498DB;
             }
-        """)
+        """
+        
+        restart_action.setStyleSheet(button_style)
+        new_game_action.setStyleSheet(button_style)
+        
         restart_action.clicked.connect(self.restart_game)
-        toolbar.addWidget(restart_action)
+        new_game_action.clicked.connect(self.new_game)
+        
+        layout.addWidget(new_game_action)
+        layout.addWidget(restart_action)
+        layout.addWidget(self.status_label)
+        layout.addStretch()  # Add stretch to push everything to the left
+        
+        widget.setLayout(layout)
+        toolbar.addWidget(widget)
+
+    def new_game(self):
+        """Start a completely new game with user choice of color"""
+        msg = QMessageBox()
+        msg.setWindowTitle("New Game")
+        msg.setText("Choose your color:")
+        white_button = msg.addButton("White", QMessageBox.ButtonRole.AcceptRole)
+        black_button = msg.addButton("Black", QMessageBox.ButtonRole.RejectRole)
+        
+        msg.exec()
+        
+        self.board = chess.Board()
+        self.selected_square = None
+        self.possible_moves.clear()
+        
+        # If player chose black, make AI play first move as white
+        if msg.clickedButton() == black_button:
+            # Make AI play as white immediately
+            self.ai_move()
+        
+        self.update_board()
+        self.update_turn_indicator()
+
+    def update_turn_indicator(self):
+        """Update the status label to show current turn with dynamic styling"""
+        current_turn = "White" if self.board.turn else "Black"
+        self.status_label.setText(f"Current Turn: {current_turn}")
+        
+        # Set background and text color based on current turn
+        if self.board.turn:  # White's turn
+            self.status_label.setStyleSheet("""
+                QLabel {
+                    background-color: #2C3E50;
+                    color: white;
+                    font-size: 16px;
+                    font-weight: bold;
+                    padding: 5px 15px;
+                    border-radius: 5px;
+                }
+            """)
+        else:  # Black's turn
+            self.status_label.setStyleSheet("""
+                QLabel {
+                    background-color: #ECF0F1;
+                    color: #2C3E50;
+                    font-size: 16px;
+                    font-weight: bold;
+                    padding: 5px 15px;
+                    border-radius: 5px;
+                }
+            """)
 
     def restart_game(self):
         self.board = chess.Board()
         self.selected_square = None
         self.possible_moves.clear()  # Add this line
         self.update_board()
+        self.update_turn_indicator()  # Add this line
 
     def on_button_clicked(self, x, y):
         square = chess.square(y, 7 - x)
@@ -187,11 +282,13 @@ class ChessGUI(QMainWindow):
                 move = chess.Move(self.selected_square, square)
                 self.board.push(move)
                 self.update_board()
+                self.update_turn_indicator()  # Add this line
                 
                 if self.board.is_game_over():
                     self.show_game_over_message()
                 else:
                     self.ai_move()
+                    self.update_turn_indicator()  # Add this line
                     if self.board.is_game_over():
                         self.show_game_over_message()
             
@@ -204,6 +301,7 @@ class ChessGUI(QMainWindow):
         if move:
             self.board.push(move)
             self.update_board()
+            self.update_turn_indicator()  # Add this line
             if self.board.is_game_over():
                 self.show_game_over_message()
 
@@ -262,8 +360,7 @@ class ChessGUI(QMainWindow):
                     
                     piece_image = os.path.join(self.pieces_path, f"{color}_{piece_type}.png")
                     if os.path.exists(piece_image):
-                        icon = QIcon(piece_image)
-                        self.buttons[(i, j)].setIcon(icon)
+                        self.buttons[(i, j)].setIcon(QIcon(piece_image))
                         self.buttons[(i, j)].setIconSize(QSize(80, 80))
                     else:
                         print(f"Missing image: {piece_image}")
@@ -283,11 +380,11 @@ class ChessGUI(QMainWindow):
             message = "Draw - Insufficient Material!"
         
         dialog = GameOverDialog(message, self)
-        if dialog.exec() == QDialog.Accepted:
+        if dialog.exec_() == QDialog.Accepted:
             self.restart_game()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ChessGUI()
     window.show()
-    sys.exit(app.exec())  # Note: exec() instead of exec_() in PyQt6
+    sys.exit(app.exec())
