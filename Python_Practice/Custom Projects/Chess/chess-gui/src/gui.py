@@ -8,6 +8,64 @@ from PyQt6.QtGui import QIcon
 import chess
 from stockfish import Stockfish
 
+class StartMenu(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Chess Game")
+        self.setFixedSize(400, 300)
+        
+        # Set window style
+        self.setStyleSheet("""
+            QDialog {
+                background-color: #2C3E50;
+            }
+            QLabel {
+                color: white;
+                font-size: 32px;
+                padding: 20px;
+            }
+            QPushButton {
+                background-color: #27AE60;
+                color: white;
+                border: none;
+                padding: 15px 30px;
+                font-size: 18px;
+                min-width: 200px;
+                margin: 10px;
+            }
+            QPushButton:hover {
+                background-color: #2ECC71;
+            }
+        """)
+
+        layout = QVBoxLayout()
+        
+        # Title
+        title = QLabel("Chess Game")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(title)
+        
+        # Buttons
+        self.vs_ai_button = QPushButton("Player vs AI")
+        self.vs_player_button = QPushButton("Player vs Player")
+        
+        layout.addWidget(self.vs_ai_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.vs_player_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        
+        self.vs_ai_button.clicked.connect(self.choose_ai_game)
+        self.vs_player_button.clicked.connect(self.choose_player_game)
+        
+        self.setLayout(layout)
+        self.game_mode = None
+        
+    def choose_ai_game(self):
+        self.game_mode = "AI"
+        self.accept()
+        
+    def choose_player_game(self):
+        self.game_mode = "Player"
+        self.accept()
+
 class GameOverDialog(QDialog):
     def __init__(self, message, parent=None):
         super().__init__(parent)
@@ -52,8 +110,9 @@ class GameOverDialog(QDialog):
         self.setLayout(layout)
 
 class ChessGUI(QMainWindow):
-    def __init__(self):
+    def __init__(self, game_mode):
         super().__init__()
+        self.game_mode = game_mode  # "AI" or "Player"
         
         # Define color constants first
         self.LIGHT_SQUARE = "#F0D9B5"  # Light brown
@@ -88,9 +147,9 @@ class ChessGUI(QMainWindow):
         
         # Initialize Stockfish with multiple possible paths
         stockfish_paths = [
+            "C:/Users/JChee/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
             "/usr/local/bin/stockfish",  # macOS Homebrew
             "/usr/bin/stockfish",        # Linux
-            "c:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
             "stockfish"  # System PATH
         ]
 
@@ -176,9 +235,10 @@ class ChessGUI(QMainWindow):
         widget = QWidget()
         layout = QHBoxLayout(widget)
         
-        # Add restart button
+        # Add buttons
         restart_action = QPushButton("Restart Game")
         new_game_action = QPushButton("New Game")
+        menu_action = QPushButton("Return to Menu")  # New button
         
         button_style = """
             QPushButton {
@@ -196,17 +256,32 @@ class ChessGUI(QMainWindow):
         
         restart_action.setStyleSheet(button_style)
         new_game_action.setStyleSheet(button_style)
+        menu_action.setStyleSheet(button_style)
         
         restart_action.clicked.connect(self.restart_game)
         new_game_action.clicked.connect(self.new_game)
+        menu_action.clicked.connect(self.return_to_menu)  # New connection
         
         layout.addWidget(new_game_action)
         layout.addWidget(restart_action)
+        layout.addWidget(menu_action)  # Add new button
         layout.addWidget(self.status_label)
-        layout.addStretch()  # Add stretch to push everything to the left
+        layout.addStretch()
         
         widget.setLayout(layout)
         toolbar.addWidget(widget)
+
+    def return_to_menu(self):
+        """Return to the start menu"""
+        self.close()  # Close current window
+        self.show_start_menu()  # Show new menu
+
+    def show_start_menu(self):
+        """Show the start menu and create new game based on selection"""
+        start_menu = StartMenu()
+        if start_menu.exec() == QDialog.DialogCode.Accepted:
+            new_window = ChessGUI(start_menu.game_mode)
+            new_window.show()
 
     def new_game(self):
         """Start a completely new game with user choice of color"""
@@ -282,13 +357,13 @@ class ChessGUI(QMainWindow):
                 move = chess.Move(self.selected_square, square)
                 self.board.push(move)
                 self.update_board()
-                self.update_turn_indicator()  # Add this line
+                self.update_turn_indicator()
                 
                 if self.board.is_game_over():
                     self.show_game_over_message()
-                else:
+                elif self.game_mode == "AI":  # Only make AI move in AI mode
                     self.ai_move()
-                    self.update_turn_indicator()  # Add this line
+                    self.update_turn_indicator()
                     if self.board.is_game_over():
                         self.show_game_over_message()
             
@@ -380,11 +455,17 @@ class ChessGUI(QMainWindow):
             message = "Draw - Insufficient Material!"
         
         dialog = GameOverDialog(message, self)
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.restart_game()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = ChessGUI()
-    window.show()
+    
+    def show_start_menu():
+        start_menu = StartMenu()
+        if start_menu.exec() == QDialog.DialogCode.Accepted:
+            window = ChessGUI(start_menu.game_mode)
+            window.show()
+    
+    show_start_menu()
     sys.exit(app.exec())
