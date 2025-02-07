@@ -3,7 +3,7 @@ import os
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QPushButton, 
                             QWidget, QMessageBox, QVBoxLayout, QDialog, QLabel,
                             QToolBar, QHBoxLayout)
-from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtCore import QSize, Qt, QTimer, QTime
 from PyQt6.QtGui import QIcon
 import chess
 from stockfish import Stockfish
@@ -147,7 +147,7 @@ class ChessGUI(QMainWindow):
         
         # Initialize Stockfish with multiple possible paths
         stockfish_paths = [
-            "C:/Users/JChee/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
+            "C:/Users/Admin/Downloads/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
             "/usr/local/bin/stockfish",  # macOS Homebrew
             "/usr/bin/stockfish",        # Linux
             "stockfish"  # System PATH
@@ -180,9 +180,27 @@ class ChessGUI(QMainWindow):
         self.status_label.setMinimumWidth(200)  # Ensure consistent width
         # Initial styling will be set by update_turn_indicator
         
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_timer)
+        self.time = QTime(0, 0)
+        self.timer_label = QLabel("Game Time: 00:00")
+        
+        self.move_stack = []  # Stack to keep track of moves for undo functionality
+
         self.initUI()
         self.create_toolbar()
         self.update_turn_indicator()  # Initial update
+        self.start_timer()  # Start the timer
+
+    def start_timer(self):
+        self.timer.start(1000)  # Update every second
+
+    def update_timer(self):
+        self.time = self.time.addSecs(1)
+        self.timer_label.setText(f"Game Time: {self.time.toString('mm:ss')}")
+
+    def stop_timer(self):
+        self.timer.stop()
 
     def get_square_color(self, i, j):  # Fix indentation
         return self.LIGHT_SQUARE if (i + j) % 2 == 0 else self.DARK_SQUARE
@@ -239,6 +257,7 @@ class ChessGUI(QMainWindow):
         restart_action = QPushButton("Restart Game")
         new_game_action = QPushButton("New Game")
         menu_action = QPushButton("Return to Menu")  # New button
+        undo_action = QPushButton("Undo Move")  # New button
         
         button_style = """
             QPushButton {
@@ -257,15 +276,19 @@ class ChessGUI(QMainWindow):
         restart_action.setStyleSheet(button_style)
         new_game_action.setStyleSheet(button_style)
         menu_action.setStyleSheet(button_style)
+        undo_action.setStyleSheet(button_style)
         
         restart_action.clicked.connect(self.restart_game)
         new_game_action.clicked.connect(self.new_game)
         menu_action.clicked.connect(self.return_to_menu)  # New connection
+        undo_action.clicked.connect(self.undo_move)  # New connection
         
         layout.addWidget(new_game_action)
         layout.addWidget(restart_action)
         layout.addWidget(menu_action)  # Add new button
+        layout.addWidget(undo_action)  # Add new button
         layout.addWidget(self.status_label)
+        layout.addWidget(self.timer_label)  # Add timer label to toolbar
         layout.addStretch()
         
         widget.setLayout(layout)
@@ -304,6 +327,8 @@ class ChessGUI(QMainWindow):
         
         self.update_board()
         self.update_turn_indicator()
+        self.time = QTime(0, 0)  # Reset the timer
+        self.start_timer()  # Restart the timer
 
     def update_turn_indicator(self):
         """Update the status label to show current turn with dynamic styling"""
@@ -340,6 +365,19 @@ class ChessGUI(QMainWindow):
         self.possible_moves.clear()  # Add this line
         self.update_board()
         self.update_turn_indicator()  # Add this line
+        self.time = QTime(0, 0)  # Reset the timer
+        self.start_timer()  # Restart the timer
+
+    def undo_move(self):
+        """Undo the last move"""
+        if len(self.board.move_stack) > 0:
+            self.board.pop()
+            self.update_board()
+            self.update_turn_indicator()
+        if self.game_mode == "AI" and len(self.board.move_stack) > 0:
+            self.board.pop()
+            self.update_board()
+            self.update_turn_indicator()
 
     def on_button_clicked(self, x, y):
         square = chess.square(y, 7 - x)
@@ -356,6 +394,7 @@ class ChessGUI(QMainWindow):
             if square in self.possible_moves:
                 move = chess.Move(self.selected_square, square)
                 self.board.push(move)
+                self.move_stack.append(move)  # Track the move
                 self.update_board()
                 self.update_turn_indicator()
                 
@@ -363,6 +402,7 @@ class ChessGUI(QMainWindow):
                     self.show_game_over_message()
                 elif self.game_mode == "AI":  # Only make AI move in AI mode
                     self.ai_move()
+                    self.move_stack.append(move)  # Track the AI move
                     self.update_turn_indicator()
                     if self.board.is_game_over():
                         self.show_game_over_message()
@@ -375,6 +415,7 @@ class ChessGUI(QMainWindow):
         move = self.get_ai_move()
         if move:
             self.board.push(move)
+            self.move_stack.append(move)  # Track the AI move
             self.update_board()
             self.update_turn_indicator()  # Add this line
             if self.board.is_game_over():
@@ -443,6 +484,7 @@ class ChessGUI(QMainWindow):
                     self.buttons[(i, j)].setIcon(QIcon())
 
     def show_game_over_message(self):
+        self.stop_timer()  # Stop the timer when the game is over
         """Show styled game over message with the result"""
         if self.board.is_checkmate():
             if self.board.turn:  # Black won (player lost)
