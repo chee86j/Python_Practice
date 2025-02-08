@@ -14,27 +14,35 @@ class StartMenu(QDialog):
         self.setWindowTitle("Chess Game")
         self.setFixedSize(400, 300)
         
-        # Set window style
+        # Set window styling
         self.setStyleSheet("""
             QDialog {
                 background-color: #2C3E50;
             }
             QLabel {
                 color: white;
-                font-size: 32px;
+                font-size: 36px;
+                font-weight: bold;
                 padding: 20px;
+                margin-bottom: 20px;
             }
             QPushButton {
                 background-color: #27AE60;
                 color: white;
                 border: none;
+                border-radius: 6px;
                 padding: 15px 30px;
                 font-size: 18px;
+                font-weight: bold;
                 min-width: 200px;
                 margin: 10px;
             }
             QPushButton:hover {
                 background-color: #2ECC71;
+                transform: scale(1.05);
+            }
+            QPushButton:pressed {
+                background-color: #219A52;
             }
         """)
 
@@ -70,7 +78,7 @@ class GameOverDialog(QDialog):
     def __init__(self, message, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Game Over")
-        self.setFixedSize(400, 200)
+        self.setFixedSize(400, 250)
         
         # Set window style
         self.setStyleSheet("""
@@ -79,19 +87,28 @@ class GameOverDialog(QDialog):
             }
             QLabel {
                 color: white;
-                font-size: 24px;
-                padding: 20px;
+                font-size: 28px;
+                font-weight: bold;
+                padding: 25px;
+                margin: 10px;
             }
             QPushButton {
                 background-color: #27AE60;
                 color: white;
                 border: none;
-                padding: 10px 20px;
-                font-size: 16px;
-                min-width: 120px;
+                border-radius: 6px;
+                padding: 15px 30px;
+                font-size: 18px;
+                font-weight: bold;
+                min-width: 150px;
+                margin: 20px;
             }
             QPushButton:hover {
                 background-color: #2ECC71;
+                transform: scale(1.05);
+            }
+            QPushButton:pressed {
+                background-color: #219A52;
             }
         """)
 
@@ -115,10 +132,45 @@ class ChessGUI(QMainWindow):
         self.game_mode = game_mode  # "AI" or "Player"
         
         # Define color constants first
-        self.LIGHT_SQUARE = "#F0D9B5"  # Light brown
-        self.DARK_SQUARE = "#B58863"   # Dark brown
-        self.SELECTED_COLOR = "#90EE90"  # Light green for selected piece
-        self.POSSIBLE_MOVE_COLOR = "#32CD32"  # Green for possible moves
+        self.LIGHT_SQUARE = "#EEEED2"  # Warmer light color
+        self.DARK_SQUARE = "#769656"   # Softer dark green
+        self.SELECTED_COLOR = "#BACA2B"  # Muted yellow for selection
+        self.POSSIBLE_MOVE_COLOR = "#8dd3c7"  # Soft teal for possible moves
+        self.HOVER_COLOR = "#DAA520"  # Golden color for hover
+        
+        # Add style constants
+        self.BUTTON_STYLE = """
+            QPushButton {
+                background-color: #2C3E50;
+                color: white;
+                border: none;
+                border-radius: 3px;
+                padding: 5px 10px;
+                font-size: 11px;
+                font-weight: bold;
+                min-width: 80px;
+                margin: 2px;
+            }
+            QPushButton:hover {
+                background-color: #34495E;
+            }
+            QPushButton:pressed {
+                background-color: #2574A9;
+            }
+        """
+        
+        self.LABEL_STYLE = """
+            QLabel {
+                color: #2C3E50;
+                font-size: 11px;
+                font-weight: bold;
+                padding: 4px 8px;
+                background-color: #ECF0F1;
+                border-radius: 3px;
+                min-width: 100px;
+                qproperty-alignment: AlignCenter;
+            }
+        """
         
         # Track selected piece and possible moves
         self.selected_square = None
@@ -142,12 +194,12 @@ class ChessGUI(QMainWindow):
                     print(f"Error loading image {image_path}: {e}")
 
         self.setWindowTitle("Chess Game")
-        self.setFixedSize(QSize(800, 800))
+        self.setFixedSize(QSize(600, 600))
         self.board = chess.Board()
         
         # Initialize Stockfish with multiple possible paths
         stockfish_paths = [
-            "C:/Users/Admin/Downloads/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
+            "C:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
             "/usr/local/bin/stockfish",  # macOS Homebrew
             "/usr/bin/stockfish",        # Linux
             "stockfish"  # System PATH
@@ -177,13 +229,15 @@ class ChessGUI(QMainWindow):
 
         # Add status label for turn indicator with dynamic styling
         self.status_label = QLabel("Current Turn: White")
-        self.status_label.setMinimumWidth(200)  # Ensure consistent width
-        # Initial styling will be set by update_turn_indicator
+        self.status_label.setMinimumWidth(120)
+        self.status_label.setMaximumWidth(120)
         
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_timer)
         self.time = QTime(0, 0)
         self.timer_label = QLabel("Game Time: 00:00")
+        self.timer_label.setMinimumWidth(100)
+        self.timer_label.setMaximumWidth(100)
         
         self.move_stack = []  # Stack to keep track of moves for undo functionality
 
@@ -197,7 +251,7 @@ class ChessGUI(QMainWindow):
 
     def update_timer(self):
         self.time = self.time.addSecs(1)
-        self.timer_label.setText(f"Game Time: {self.time.toString('mm:ss')}")
+        self.timer_label.setText(f"Time: {self.time.toString('mm:ss')}")
 
     def stop_timer(self):
         self.timer.stop()
@@ -217,8 +271,7 @@ class ChessGUI(QMainWindow):
         for i in range(8):
             for j in range(8):
                 button = QPushButton("")
-                button.setFixedSize(100, 100)
-                # Use class color constants
+                button.setFixedSize(70, 70)
                 color = self.get_square_color(i, j)
                 button.setStyleSheet(f"""
                     QPushButton {{
@@ -226,7 +279,8 @@ class ChessGUI(QMainWindow):
                         border: none;
                     }}
                     QPushButton:hover {{
-                        background-color: #DAA520;  /* Golden color on hover */
+                        background-color: {self.HOVER_COLOR};
+                        border: 2px solid #FFF3;
                     }}
                 """)
                 button.clicked.connect(lambda _, x=i, y=j: self.on_button_clicked(x, y))
@@ -248,47 +302,59 @@ class ChessGUI(QMainWindow):
         toolbar = QToolBar("Game Controls", self)
         self.addToolBar(toolbar)
         toolbar.setMovable(False)
+        toolbar.setStyleSheet("""
+            QToolBar {
+                spacing: 5px;
+                padding: 2px;
+                background-color: #F5F5F5;
+                border-bottom: 1px solid #DDD;
+            }
+        """)
 
         # Create widget to hold buttons and status
         widget = QWidget()
         layout = QHBoxLayout(widget)
+        layout.setSpacing(5)
+        layout.setContentsMargins(5, 2, 5, 2)
         
-        # Add buttons
-        restart_action = QPushButton("Restart Game")
-        new_game_action = QPushButton("New Game")
-        menu_action = QPushButton("Return to Menu")  # New button
-        undo_action = QPushButton("Undo Move")  # New button
+        # Add Buttons with smaller spacing
+        buttons = [
+            ("New", self.new_game),
+            ("Restart", self.restart_game),
+            ("Menu", self.return_to_menu),
+            ("Undo", self.undo_move)
+        ]
         
-        button_style = """
-            QPushButton {
-                background-color: #2980B9;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                font-size: 14px;
-                margin-right: 10px;
-            }
-            QPushButton:hover {
-                background-color: #3498DB;
-            }
-        """
+        # Create button group
+        button_widget = QWidget()
+        button_layout = QHBoxLayout(button_widget)
+        button_layout.setSpacing(2)
+        button_layout.setContentsMargins(0, 0, 0, 0)
         
-        restart_action.setStyleSheet(button_style)
-        new_game_action.setStyleSheet(button_style)
-        menu_action.setStyleSheet(button_style)
-        undo_action.setStyleSheet(button_style)
+        for text, callback in buttons:
+            btn = QPushButton(text)
+            btn.setStyleSheet(self.BUTTON_STYLE)
+            btn.clicked.connect(callback)
+            button_layout.addWidget(btn)
         
-        restart_action.clicked.connect(self.restart_game)
-        new_game_action.clicked.connect(self.new_game)
-        menu_action.clicked.connect(self.return_to_menu)  # New connection
-        undo_action.clicked.connect(self.undo_move)  # New connection
+        layout.addWidget(button_widget)
         
-        layout.addWidget(new_game_action)
-        layout.addWidget(restart_action)
-        layout.addWidget(menu_action)  # Add new button
-        layout.addWidget(undo_action)  # Add new button
-        layout.addWidget(self.status_label)
-        layout.addWidget(self.timer_label)  # Add timer label to toolbar
+        # Add spacer
+        layout.addSpacing(10)
+        
+        # Add status labels with fixed width
+        status_widget = QWidget()
+        status_layout = QHBoxLayout(status_widget)
+        status_layout.setSpacing(5)
+        status_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.status_label.setStyleSheet(self.LABEL_STYLE)
+        self.timer_label.setStyleSheet(self.LABEL_STYLE)
+        
+        status_layout.addWidget(self.status_label)
+        status_layout.addWidget(self.timer_label)
+        
+        layout.addWidget(status_widget)
         layout.addStretch()
         
         widget.setLayout(layout)
@@ -333,29 +399,31 @@ class ChessGUI(QMainWindow):
     def update_turn_indicator(self):
         """Update the status label to show current turn with dynamic styling"""
         current_turn = "White" if self.board.turn else "Black"
-        self.status_label.setText(f"Current Turn: {current_turn}")
+        self.status_label.setText(f"Turn: {current_turn}")
         
         # Set background and text color based on current turn
         if self.board.turn:  # White's turn
             self.status_label.setStyleSheet("""
                 QLabel {
-                    background-color: #2C3E50;
-                    color: white;
-                    font-size: 16px;
+                    background-color: #FFFFFF;
+                    color: #2C3E50;
+                    font-size: 14px;
                     font-weight: bold;
                     padding: 5px 15px;
-                    border-radius: 5px;
+                    border-radius: 4px;
+                    border: 2px solid #2C3E50;
                 }
             """)
         else:  # Black's turn
             self.status_label.setStyleSheet("""
                 QLabel {
-                    background-color: #ECF0F1;
-                    color: #2C3E50;
-                    font-size: 16px;
+                    background-color: #2C3E50;
+                    color: #FFFFFF;
+                    font-size: 14px;
                     font-weight: bold;
                     padding: 5px 15px;
-                    border-radius: 5px;
+                    border-radius: 4px;
+                    border: 2px solid #FFFFFF;
                 }
             """)
 
@@ -477,7 +545,7 @@ class ChessGUI(QMainWindow):
                     piece_image = os.path.join(self.pieces_path, f"{color}_{piece_type}.png")
                     if os.path.exists(piece_image):
                         self.buttons[(i, j)].setIcon(QIcon(piece_image))
-                        self.buttons[(i, j)].setIconSize(QSize(80, 80))
+                        self.buttons[(i, j)].setIconSize(QSize(60, 60))
                     else:
                         print(f"Missing image: {piece_image}")
                 else:
