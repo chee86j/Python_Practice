@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QPushButton, 
                             QWidget, QMessageBox, QVBoxLayout, QDialog, QLabel,
-                            QToolBar, QHBoxLayout)
+                            QToolBar, QHBoxLayout, QGroupBox, QListWidget, QFileDialog)
 from PyQt6.QtCore import QSize, Qt, QTimer, QTime
 from PyQt6.QtGui import QIcon
 import chess
@@ -132,16 +132,16 @@ class ChessGUI(QMainWindow):
         self.game_mode = game_mode  # "AI" or "Player"
         
         # Define color constants first
-        self.LIGHT_SQUARE = "#EEEED2"  # Warmer light color
-        self.DARK_SQUARE = "#769656"   # Softer dark green
-        self.SELECTED_COLOR = "#BACA2B"  # Muted yellow for selection
-        self.POSSIBLE_MOVE_COLOR = "#8dd3c7"  # Soft teal for possible moves
-        self.HOVER_COLOR = "#DAA520"  # Golden color for hover
+        self.LIGHT_SQUARE = "#E8EDF9"    # Light blue-gray
+        self.DARK_SQUARE = "#B7C0D8"     # Medium blue-gray
+        self.SELECTED_COLOR = "#4A90E2"   # Bright blue
+        self.POSSIBLE_MOVE_COLOR = "#81A1C1"  # Muted blue
+        self.HOVER_COLOR = "#5E81AC"      # Dark blue
         
         # Add style constants
         self.BUTTON_STYLE = """
             QPushButton {
-                background-color: #2C3E50;
+                background-color: #4C566A;
                 color: white;
                 border: none;
                 border-radius: 3px;
@@ -150,12 +150,13 @@ class ChessGUI(QMainWindow):
                 font-weight: bold;
                 min-width: 80px;
                 margin: 2px;
+                box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
             }
             QPushButton:hover {
-                background-color: #34495E;
+                background-color: #5E81AC;
             }
             QPushButton:pressed {
-                background-color: #2574A9;
+                background-color: #81A1C1;
             }
         """
         
@@ -194,7 +195,7 @@ class ChessGUI(QMainWindow):
                     print(f"Error loading image {image_path}: {e}")
 
         self.setWindowTitle("Chess Game")
-        self.setFixedSize(QSize(600, 600))
+        self.setFixedSize(QSize(800, 600))
         self.board = chess.Board()
         
         # Initialize Stockfish with multiple possible paths
@@ -241,8 +242,19 @@ class ChessGUI(QMainWindow):
         
         self.move_stack = []  # Stack to keep track of moves for undo functionality
 
+        # Add new features initialization
+        self.difficulty_levels = {
+            'Easy': 2,
+            'Medium': 10,
+            'Hard': 15
+        }
+        self.current_difficulty = 'Medium'
+        self.move_history = []
+        self.captured_pieces = {'white': [], 'black': []}
+        
         self.initUI()
         self.create_toolbar()
+        self.create_side_panel()
         self.update_turn_indicator()  # Initial update
         self.start_timer()  # Start the timer
 
@@ -360,103 +372,95 @@ class ChessGUI(QMainWindow):
         widget.setLayout(layout)
         toolbar.addWidget(widget)
 
-    def return_to_menu(self):
-        """Return to the start menu"""
-        self.close()  # Close current window
-        self.show_start_menu()  # Show new menu
-
-    def show_start_menu(self):
-        """Show the start menu and create new game based on selection"""
-        start_menu = StartMenu()
-        if start_menu.exec() == QDialog.DialogCode.Accepted:
-            new_window = ChessGUI(start_menu.game_mode)
-            new_window.show()
-
-    def new_game(self):
-        """Start a completely new game with user choice of color"""
-        msg = QMessageBox()
-        msg.setWindowTitle("New Game")
-        msg.setText("Choose your color:")
-        white_button = msg.addButton("White", QMessageBox.ButtonRole.AcceptRole)
-        black_button = msg.addButton("Black", QMessageBox.ButtonRole.RejectRole)
+    def create_side_panel(self):
+        """Create side panel for move history and captured pieces"""
+        side_panel = QWidget()
+        side_layout = QVBoxLayout()
         
-        msg.exec()
+        if self.game_mode == "AI":
+            difficulty_group = QGroupBox("AI Difficulty")
+            difficulty_layout = QHBoxLayout()
+            for level in self.difficulty_levels.keys():
+                btn = QPushButton(level)
+                btn.setCheckable(True)
+                btn.setChecked(level == self.current_difficulty)
+                btn.clicked.connect(lambda checked, l=level: self.set_difficulty(l))
+                difficulty_layout.addWidget(btn)
+            difficulty_group.setLayout(difficulty_layout)
+            side_layout.addWidget(difficulty_group)
         
-        self.board = chess.Board()
-        self.selected_square = None
-        self.possible_moves.clear()
+        # Add captured pieces display
+        captured_group = QGroupBox("Captured Pieces")
+        captured_layout = QVBoxLayout()
+        self.white_captured = QLabel("White: ")
+        self.black_captured = QLabel("Black: ")
+        captured_layout.addWidget(self.white_captured)
+        captured_layout.addWidget(self.black_captured)
+        captured_group.setLayout(captured_layout)
+        side_layout.addWidget(captured_group)
         
-        # If player chose black, make AI play first move as white
-        if msg.clickedButton() == black_button:
-            # Make AI play as white immediately
-            self.ai_move()
+        # Add move history
+        history_group = QGroupBox("Move History")
+        history_layout = QVBoxLayout()
+        self.move_list = QListWidget()
+        history_layout.addWidget(self.move_list)
+        history_group.setLayout(history_layout)
+        side_layout.addWidget(history_group)
         
-        self.update_board()
-        self.update_turn_indicator()
-        self.time = QTime(0, 0)  # Reset the timer
-        self.start_timer()  # Restart the timer
+        # Add save/load buttons
+        save_load_layout = QHBoxLayout()
+        save_btn = QPushButton("Save Game")
+        load_btn = QPushButton("Load Game")
+        save_btn.clicked.connect(self.save_game)
+        load_btn.clicked.connect(self.load_game)
+        save_load_layout.addWidget(save_btn)
+        save_load_layout.addWidget(load_btn)
+        side_layout.addLayout(save_load_layout)
+        
+        side_panel.setLayout(side_layout)
+        side_panel.setFixedWidth(200)
+        
+        # Create main layout
+        main_widget = QWidget()
+        main_layout = QHBoxLayout()
+        main_layout.addWidget(self.central_widget)
+        main_layout.addWidget(side_panel)
+        main_widget.setLayout(main_layout)
+        self.setCentralWidget(main_widget)
 
-    def update_turn_indicator(self):
-        """Update the status label to show current turn with dynamic styling"""
-        current_turn = "White" if self.board.turn else "Black"
-        self.status_label.setText(f"Turn: {current_turn}")
-        
-        # Set background and text color based on current turn
-        if self.board.turn:  # White's turn
-            self.status_label.setStyleSheet("""
-                QLabel {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    font-size: 14px;
-                    font-weight: bold;
-                    padding: 5px 15px;
-                    border-radius: 4px;
-                    border: 2px solid #2C3E50;
-                }
-            """)
-        else:  # Black's turn
-            self.status_label.setStyleSheet("""
-                QLabel {
-                    background-color: #2C3E50;
-                    color: #FFFFFF;
-                    font-size: 14px;
-                    font-weight: bold;
-                    padding: 5px 15px;
-                    border-radius: 4px;
-                    border: 2px solid #FFFFFF;
-                }
-            """)
+    def set_difficulty(self, level):
+        """Set AI difficulty level"""
+        self.current_difficulty = level
+        self.engine.set_skill_level(self.difficulty_levels[level])
 
-    def restart_game(self):
-        self.board = chess.Board()
-        self.selected_square = None
-        self.possible_moves.clear()  # Add this line
-        self.update_board()
-        self.update_turn_indicator()  # Add this line
-        self.time = QTime(0, 0)  # Reset the timer
-        self.start_timer()  # Restart the timer
+    def update_move_history(self, move):
+        """Update move history display"""
+        move_text = self.board.san(move)
+        turn = len(self.move_history) // 2 + 1
+        if len(self.move_history) % 2 == 0:
+            item_text = f"{turn}. {move_text}"
+        else:
+            item_text = f"    {move_text}"
+        self.move_list.addItem(item_text)
+        self.move_history.append(move_text)
+        self.move_list.scrollToBottom()
 
-    def undo_move(self):
-        """Undo the last move"""
-        if len(self.board.move_stack) > 0:
-            self.board.pop()
-            self.update_board()
-            self.update_turn_indicator()
-        if self.game_mode == "AI" and len(self.board.move_stack) > 0:
-            self.board.pop()
-            self.update_board()
-            self.update_turn_indicator()
+    def update_captured_pieces(self, move):
+        """Update captured pieces display"""
+        captured_piece = self.board.piece_at(move.to_square)
+        if captured_piece:
+            color = 'white' if captured_piece.color == chess.WHITE else 'black'
+            self.captured_pieces[color].append(captured_piece)
+            self.update_captured_display()
 
-    def on_button_clicked(self, x, y):
-        square = chess.square(y, 7 - x)
-        
+    def on_button_clicked(self, i, j):
+        square = chess.square(j, 7 - i)
         if self.selected_square is None:
-            # First click - select piece if it belongs to player
+            # First click - select a piece
             piece = self.board.piece_at(square)
-            if piece is not None and piece.color == self.board.turn:
+            if piece and piece.color == self.board.turn:
                 self.selected_square = square
                 self.highlight_possible_moves(square)
-                self.update_board()
         else:
             # Second click - try to make a move
             if square in self.possible_moves:
