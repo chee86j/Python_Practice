@@ -1,130 +1,12 @@
-import sys
 import os
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QGridLayout, QPushButton, 
-                            QWidget, QMessageBox, QVBoxLayout, QDialog, QLabel,
-                            QToolBar, QHBoxLayout, QGroupBox, QListWidget, QFileDialog)
+import sys
+from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout, QPushButton, QToolBar, QHBoxLayout, QLabel, QVBoxLayout, QGroupBox, QListWidget, QMessageBox, QDialog, QFileDialog
 from PyQt6.QtCore import QSize, Qt, QTimer, QTime
 from PyQt6.QtGui import QIcon
 import chess
 from stockfish import Stockfish
-
-class StartMenu(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Chess Game")
-        self.setFixedSize(400, 300)
-        
-        # Set window styling
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #2C3E50;
-            }
-            QLabel {
-                color: white;
-                font-size: 36px;
-                font-weight: bold;
-                padding: 20px;
-                margin-bottom: 20px;
-            }
-            QPushButton {
-                background-color: #27AE60;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 15px 30px;
-                font-size: 18px;
-                font-weight: bold;
-                min-width: 200px;
-                margin: 10px;
-            }
-            QPushButton:hover {
-                background-color: #2ECC71;
-                transform: scale(1.05);
-            }
-            QPushButton:pressed {
-                background-color: #219A52;
-            }
-        """)
-
-        layout = QVBoxLayout()
-        
-        # Title
-        title = QLabel("Chess Game")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(title)
-        
-        # Buttons
-        self.vs_ai_button = QPushButton("Player vs AI")
-        self.vs_player_button = QPushButton("Player vs Player")
-        
-        layout.addWidget(self.vs_ai_button, alignment=Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.vs_player_button, alignment=Qt.AlignmentFlag.AlignCenter)
-        
-        self.vs_ai_button.clicked.connect(self.choose_ai_game)
-        self.vs_player_button.clicked.connect(self.choose_player_game)
-        
-        self.setLayout(layout)
-        self.game_mode = None
-        
-    def choose_ai_game(self):
-        self.game_mode = "AI"
-        self.accept()
-        
-    def choose_player_game(self):
-        self.game_mode = "Player"
-        self.accept()
-
-class GameOverDialog(QDialog):
-    def __init__(self, message, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Game Over")
-        self.setFixedSize(400, 250)
-        
-        # Set window style
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #2C3E50;
-            }
-            QLabel {
-                color: white;
-                font-size: 28px;
-                font-weight: bold;
-                padding: 25px;
-                margin: 10px;
-            }
-            QPushButton {
-                background-color: #27AE60;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 15px 30px;
-                font-size: 18px;
-                font-weight: bold;
-                min-width: 150px;
-                margin: 20px;
-            }
-            QPushButton:hover {
-                background-color: #2ECC71;
-                transform: scale(1.05);
-            }
-            QPushButton:pressed {
-                background-color: #219A52;
-            }
-        """)
-
-        layout = QVBoxLayout()
-        
-        # Message label
-        message_label = QLabel(message)
-        message_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(message_label)
-        
-        # Restart button
-        restart_button = QPushButton("Play Again")
-        restart_button.clicked.connect(self.accept)
-        layout.addWidget(restart_button, alignment=Qt.AlignmentFlag.AlignCenter)
-        
-        self.setLayout(layout)
+from .game_over_dialog import GameOverDialog
+from .start_menu import StartMenu  # Add this import
 
 class ChessGUI(QMainWindow):
     def __init__(self, game_mode):
@@ -135,7 +17,7 @@ class ChessGUI(QMainWindow):
         self.LIGHT_SQUARE = "#E8EDF9"    # Light blue-gray
         self.DARK_SQUARE = "#B7C0D8"     # Medium blue-gray
         self.SELECTED_COLOR = "#4A90E2"   # Bright blue
-        self.POSSIBLE_MOVE_COLOR = "#81A1C1"  # Muted blue
+        self.POSSIBLE_MOVE_COLOR = "#32CD32"  # Green for possible moves
         self.HOVER_COLOR = "#5E81AC"      # Dark blue
         
         # Add style constants
@@ -150,7 +32,6 @@ class ChessGUI(QMainWindow):
                 font-weight: bold;
                 min-width: 80px;
                 margin: 2px;
-                box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
             }
             QPushButton:hover {
                 background-color: #5E81AC;
@@ -181,7 +62,7 @@ class ChessGUI(QMainWindow):
         self.SQUARE_SIZE = 80
         
         # Define the base path for piece images
-        self.pieces_path = os.path.join(os.path.dirname(__file__), "assets", "pieces")
+        self.pieces_path = os.path.join(os.path.dirname(__file__), "..", "assets", "pieces")
         
         # Load piece images
         self.pieces = {}
@@ -200,6 +81,7 @@ class ChessGUI(QMainWindow):
         
         # Initialize Stockfish with multiple possible paths
         stockfish_paths = [
+            "C:/Users/Admin/Downloads/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
             "C:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
             "/usr/local/bin/stockfish",  # macOS Homebrew
             "/usr/bin/stockfish",        # Linux
@@ -242,13 +124,7 @@ class ChessGUI(QMainWindow):
         
         self.move_stack = []  # Stack to keep track of moves for undo functionality
 
-        # Add new features initialization
-        self.difficulty_levels = {
-            'Easy': 2,
-            'Medium': 10,
-            'Hard': 15
-        }
-        self.current_difficulty = 'Medium'
+        # Remove AI difficulty feature
         self.move_history = []
         self.captured_pieces = {'white': [], 'black': []}
         
@@ -292,7 +168,7 @@ class ChessGUI(QMainWindow):
                     }}
                     QPushButton:hover {{
                         background-color: {self.HOVER_COLOR};
-                        border: 2px solid #FFF3;
+                        border: 2px solid #DAA520;
                     }}
                 """)
                 button.clicked.connect(lambda _, x=i, y=j: self.on_button_clicked(x, y))
@@ -308,6 +184,7 @@ class ChessGUI(QMainWindow):
             for move in self.board.legal_moves:
                 if move.from_square == square:
                     self.possible_moves.add(move.to_square)
+        self.update_board()  # Update the board to show possible moves
 
 
     def create_toolbar(self):
@@ -377,18 +254,7 @@ class ChessGUI(QMainWindow):
         side_panel = QWidget()
         side_layout = QVBoxLayout()
         
-        if self.game_mode == "AI":
-            difficulty_group = QGroupBox("AI Difficulty")
-            difficulty_layout = QHBoxLayout()
-            for level in self.difficulty_levels.keys():
-                btn = QPushButton(level)
-                btn.setCheckable(True)
-                btn.setChecked(level == self.current_difficulty)
-                btn.clicked.connect(lambda checked, l=level: self.set_difficulty(l))
-                difficulty_layout.addWidget(btn)
-            difficulty_group.setLayout(difficulty_layout)
-            side_layout.addWidget(difficulty_group)
-        
+        # Remove AI difficulty feature
         # Add captured pieces display
         captured_group = QGroupBox("Captured Pieces")
         captured_layout = QVBoxLayout()
@@ -427,11 +293,6 @@ class ChessGUI(QMainWindow):
         main_layout.addWidget(side_panel)
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
-
-    def set_difficulty(self, level):
-        """Set AI difficulty level"""
-        self.current_difficulty = level
-        self.engine.set_skill_level(self.difficulty_levels[level])
 
     def update_move_history(self, move):
         """Update move history display"""
@@ -483,6 +344,7 @@ class ChessGUI(QMainWindow):
             self.selected_square = None
             self.possible_moves.clear()
             self.update_board()
+
     def ai_move(self):
         move = self.get_ai_move()
         if move:
@@ -572,14 +434,107 @@ class ChessGUI(QMainWindow):
         if dialog.exec() == QDialog.Accepted:
             self.restart_game()
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    
-    def show_start_menu():
+    def restart_game(self):
+        """Restart the current game"""
+        self.board = chess.Board()
+        self.selected_square = None
+        self.possible_moves.clear()
+        self.update_board()
+        self.update_turn_indicator()
+        self.time = QTime(0, 0)  # Reset the timer
+        self.start_timer()  # Restart the timer
+
+    def new_game(self):
+        """Start a completely new game with user choice of color"""
+        msg = QMessageBox()
+        msg.setWindowTitle("New Game")
+        msg.setText("Choose your color:")
+        white_button = msg.addButton("White", QMessageBox.ButtonRole.AcceptRole)
+        black_button = msg.addButton("Black", QMessageBox.ButtonRole.RejectRole)
+        
+        msg.exec()
+        
+        self.board = chess.Board()
+        self.selected_square = None
+        self.possible_moves.clear()
+        
+        # If player chose black, make AI play first move as white
+        if msg.clickedButton() == black_button:
+            # Make AI play as white immediately
+            self.ai_move()
+        
+        self.update_board()
+        self.update_turn_indicator()
+        self.time = QTime(0, 0)  # Reset the timer
+        self.start_timer()  # Restart the timer
+
+    def undo_move(self):
+        """Undo the last move"""
+        if len(self.board.move_stack) > 0:
+            self.board.pop()
+            self.update_board()
+            self.update_turn_indicator()
+        if self.game_mode == "AI" and len(self.board.move_stack) > 0:
+            self.board.pop()
+            self.update_board()
+            self.update_turn_indicator()
+
+    def return_to_menu(self):
+        """Return to the start menu"""
+        self.close()  # Close current window
+        self.show_start_menu()  # Show new menu
+
+    def show_start_menu(self):
+        """Show the start menu and create new game based on selection"""
         start_menu = StartMenu()
         if start_menu.exec() == QDialog.DialogCode.Accepted:
-            window = ChessGUI(start_menu.game_mode)
-            window.show()
-    
-    show_start_menu()
-    sys.exit(app.exec())
+            new_window = ChessGUI(start_menu.game_mode)
+            new_window.show()
+
+    def save_game(self):
+        """Save the current game state to a file"""
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save Game", "", "Chess Files (*.chess);;All Files (*)", options=options)
+        if file_path:
+            with open(file_path, 'w') as file:
+                file.write(self.board.fen())
+
+    def load_game(self):
+        """Load a game state from a file"""
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(self, "Load Game", "", "Chess Files (*.chess);;All Files (*)", options=options)
+        if file_path:
+            with open(file_path, 'r') as file:
+                fen = file.read()
+                self.board.set_fen(fen)
+                self.update_board()
+                self.update_turn_indicator()
+
+    def update_turn_indicator(self):
+        """Update the status label to show current turn with dynamic styling"""
+        current_turn = "White" if self.board.turn else "Black"
+        self.status_label.setText(f"Current Turn: {current_turn}")
+        
+        # Set background and text color based on current turn
+        if self.board.turn:  # White's turn
+            self.status_label.setStyleSheet("""
+                QLabel {
+                    background-color: #2C3E50;
+                    color: white;
+                    font-size: 16px;
+                    font-weight: bold;
+                    padding: 5px 15px;
+                    border-radius: 5px;
+                }
+            """)
+        else:  # Black's turn
+            self.status_label.setStyleSheet("""
+                QLabel {
+                    background-color: #ECF0F1;
+                    color: #2C3E50;
+                    font-size: 16px;
+                    font-weight: bold;
+                    padding: 5px 15px;
+                    border-radius: 5px;
+                }
+            """)
