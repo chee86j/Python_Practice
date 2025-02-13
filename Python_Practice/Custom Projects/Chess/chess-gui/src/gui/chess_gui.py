@@ -128,6 +128,7 @@ class ChessGUI(QMainWindow):
 
         # Remove AI difficulty feature
         self.move_history = []
+        self.current_move_number = 1
         self.captured_pieces = {'white': Counter(), 'black': Counter()}
         self.white_captured = None
         self.black_captured = None
@@ -137,6 +138,12 @@ class ChessGUI(QMainWindow):
         self.captured_pieces = {
             'white': {symbol: 0 for symbol in piece_symbols},
             'black': {symbol: 0 for symbol in piece_symbols}
+        }
+        
+        # Add piece symbols mapping
+        self.piece_symbols = {
+            'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',  # White pieces
+            'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'   # Black pieces
         }
         
         self.initUI()
@@ -327,18 +334,44 @@ class ChessGUI(QMainWindow):
         main_layout.addWidget(side_panel)
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
+        
+        # Update move history styling to support Unicode symbols
+        self.move_list.setStyleSheet("""
+            QListWidget {
+                font-size: 14px;
+                font-family: Arial;
+                padding: 5px;
+            }
+            QListWidget::item {
+                padding: 3px;
+            }
+        """)
 
     def update_move_history(self, move):
-        """Update move history display"""
-        move_text = self.board.san(move)
-        turn = len(self.move_history) // 2 + 1
-        if len(self.move_history) % 2 == 0:
-            item_text = f"{turn}. {move_text}"
-        else:
-            item_text = f"    {move_text}"
-        self.move_list.addItem(item_text)
-        self.move_history.append(move_text)
-        self.move_list.scrollToBottom()
+        """Update move history display with conventional chess notation and Unicode symbols"""
+        try:
+            move_text = self.board.san(move)  # Get standard algebraic notation
+            
+            # Piece letters with Unicode symbols
+            for piece_letter, symbol in self.piece_symbols.items():
+                if piece_letter.isupper():  # Only replace uppercase pieces (white)
+                    move_text = move_text.replace(piece_letter, symbol)
+            
+            # For white's move (even number of moves in history)
+            if len(self.move_history) % 2 == 0:
+                item_text = f"{self.current_move_number}. {move_text}"
+                self.move_list.addItem(item_text)
+            else:
+                # For black's move, append to the current line
+                current_item = self.move_list.item(self.move_list.count() - 1)
+                current_text = current_item.text()
+                current_item.setText(f"{current_text}  {move_text}")
+                self.current_move_number += 1
+            
+            self.move_history.append(move_text)
+            self.move_list.scrollToBottom()
+        except Exception as e:
+            print(f"Error updating move history: {e}")
 
     def update_captured_pieces(self, captured_piece):
         """Update captured pieces display"""
@@ -518,6 +551,9 @@ class ChessGUI(QMainWindow):
         self.captured_pieces = {'white': Counter(), 'black': Counter()}
         self.white_captured.setText("White: ")
         self.black_captured.setText("Black: ")
+        self.move_history = []
+        self.current_move_number = 1
+        self.move_list.clear()
         self.update_board()
         self.update_turn_indicator()
         self.time = QTime(0, 0)  # Reset the timer
@@ -539,6 +575,9 @@ class ChessGUI(QMainWindow):
         self.captured_pieces = {'white': Counter(), 'black': Counter()}
         self.white_captured.setText("White: ")
         self.black_captured.setText("Black: ")
+        self.move_history = []
+        self.current_move_number = 1
+        self.move_list.clear()
         
         # If player chose black, make AI play first move as white
         if msg.clickedButton() == black_button:
@@ -554,10 +593,36 @@ class ChessGUI(QMainWindow):
         """Undo the last move"""
         if len(self.board.move_stack) > 0:
             self.board.pop()
+            if self.move_history:
+                self.move_history.pop()
+                # Remove or update the last move in the display
+                if len(self.move_history) % 2 == 0:
+                    self.move_list.takeItem(self.move_list.count() - 1)
+                    self.current_move_number -= 1
+                else:
+                    # Update the last item to remove black's move
+                    current_item = self.move_list.item(self.move_list.count() - 1)
+                    move_num = len(self.move_history) // 2 + 1
+                    white_move = self.move_history[-1]
+                    current_item.setText(f"{move_num}. {white_move}")
+            
             self.update_board()
             self.update_turn_indicator()
+
         if self.game_mode == "AI" and len(self.board.move_stack) > 0:
+            # Undo AI's move as well
             self.board.pop()
+            if self.move_history:
+                self.move_history.pop()
+                if len(self.move_history) % 2 == 0:
+                    self.move_list.takeItem(self.move_list.count() - 1)
+                    self.current_move_number -= 1
+                else:
+                    current_item = self.move_list.item(self.move_list.count() - 1)
+                    move_num = len(self.move_history) // 2 + 1
+                    white_move = self.move_history[-1]
+                    current_item.setText(f"{move_num}. {white_move}")
+            
             self.update_board()
             self.update_turn_indicator()
 
