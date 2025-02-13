@@ -7,6 +7,7 @@ import chess
 from stockfish import Stockfish
 from .game_over_dialog import GameOverDialog
 from .start_menu import StartMenu  # Add this import
+from collections import Counter
 
 class ChessGUI(QMainWindow):
     def __init__(self, game_mode):
@@ -83,6 +84,7 @@ class ChessGUI(QMainWindow):
         stockfish_paths = [
             "C:/Users/Admin/Downloads/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
             "C:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
+            "C:/Users/JChee/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
             "/usr/local/bin/stockfish",  # macOS Homebrew
             "/usr/bin/stockfish",        # Linux
             "stockfish"  # System PATH
@@ -91,7 +93,7 @@ class ChessGUI(QMainWindow):
         self.engine = None
         for path in stockfish_paths:
             try:
-                self.engine = Stockfish(path=path)
+                self.engine = Stockfish(path=path, depth=10)  # Add depth parameter
                 break
             except Exception:
                 continue
@@ -126,7 +128,16 @@ class ChessGUI(QMainWindow):
 
         # Remove AI difficulty feature
         self.move_history = []
-        self.captured_pieces = {'white': [], 'black': []}
+        self.captured_pieces = {'white': Counter(), 'black': Counter()}
+        self.white_captured = None
+        self.black_captured = None
+        
+        # Initialize captured pieces tracking with all possible pieces
+        piece_symbols = ['♟', '♞', '♝', '♜', '♛', '♚']
+        self.captured_pieces = {
+            'white': {symbol: 0 for symbol in piece_symbols},
+            'black': {symbol: 0 for symbol in piece_symbols}
+        }
         
         self.initUI()
         self.create_toolbar()
@@ -254,12 +265,35 @@ class ChessGUI(QMainWindow):
         side_panel = QWidget()
         side_layout = QVBoxLayout()
         
-        # Remove AI difficulty feature
-        # Add captured pieces display
+        # Add captured pieces display with styling
         captured_group = QGroupBox("Captured Pieces")
+        captured_group.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                margin-top: 10px;
+                padding: 5px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+            }
+            QLabel {
+                font-size: 16px;
+                padding: 8px;
+                margin: 4px;
+                background-color: #f0f0f0;
+                border-radius: 3px;
+                min-height: 20px;
+            }
+        """)
+        
         captured_layout = QVBoxLayout()
         self.white_captured = QLabel("White: ")
         self.black_captured = QLabel("Black: ")
+        self.white_captured.setMinimumWidth(180)
+        self.black_captured.setMinimumWidth(180)
         captured_layout.addWidget(self.white_captured)
         captured_layout.addWidget(self.black_captured)
         captured_group.setLayout(captured_layout)
@@ -306,13 +340,39 @@ class ChessGUI(QMainWindow):
         self.move_history.append(move_text)
         self.move_list.scrollToBottom()
 
-    def update_captured_pieces(self, move):
+    def update_captured_pieces(self, captured_piece):
         """Update captured pieces display"""
-        captured_piece = self.board.piece_at(move.to_square)
         if captured_piece:
-            color = 'white' if captured_piece.color == chess.WHITE else 'black'
-            self.captured_pieces[color].append(captured_piece)
-            self.update_captured_display()
+            # Determine which side captured the piece
+            capturing_color = 'white' if not captured_piece.color else 'black'
+            
+            # Map piece type to symbol
+            piece_symbols = {
+                chess.PAWN: '♟',
+                chess.KNIGHT: '♞',
+                chess.BISHOP: '♝',
+                chess.ROOK: '♜',
+                chess.QUEEN: '♛',
+                chess.KING: '♚'
+            }
+            symbol = piece_symbols[captured_piece.piece_type]
+            
+            # Update counter
+            self.captured_pieces[capturing_color][symbol] += 1
+            
+            # Update display for both sides
+            for side in ['white', 'black']:
+                # Sort pieces by value
+                pieces_display = []
+                for piece_symbol in ['♚', '♛', '♜', '♝', '♞', '♟']:
+                    count = self.captured_pieces[side][piece_symbol]
+                    if count > 0:
+                        pieces_display.append(f"{piece_symbol}×{count}")
+                
+                # Join all pieces with spaces and update label
+                pieces_str = " ".join(pieces_display)
+                label = self.white_captured if side == 'white' else self.black_captured
+                label.setText(f"{side.capitalize()}: {pieces_str}")
 
     def on_button_clicked(self, i, j):
         square = chess.square(j, 7 - i)
@@ -326,20 +386,36 @@ class ChessGUI(QMainWindow):
             # Second click - try to make a move
             if square in self.possible_moves:
                 move = chess.Move(self.selected_square, square)
+                
+                # First update history (before making the move)
+                self.update_move_history(move)
+                
+                # Check for capture before making move
+                captured_piece = self.board.piece_at(square)
+                
+                # Make the move
                 self.board.push(move)
-                self.move_stack.append(move)  # Track the move
+                
+                if captured_piece:
+                    self.update_captured_pieces(captured_piece)
+                
+                self.move_stack.append(move)
                 self.update_board()
                 self.update_turn_indicator()
                 
+                # Handle game over and AI moves
                 if self.board.is_game_over():
                     self.show_game_over_message()
-                elif self.game_mode == "AI":  # Only make AI move in AI mode
-                    self.ai_move()
-                    self.move_stack.append(move)  # Track the AI move
-                    self.update_turn_indicator()
-                    if self.board.is_game_over():
-                        self.show_game_over_message()
-            
+                elif self.game_mode == "AI":
+                    ai_move = self.get_ai_move()
+                    if ai_move:
+                        # Check for AI capture before making move
+                        ai_captured = self.board.piece_at(ai_move.to_square)
+                        self.board.push(ai_move)
+                        self.move_stack.append(ai_move)
+                        if ai_captured:
+                            self.update_captured_pieces(ai_captured)
+                
             # Reset selection and highlights
             self.selected_square = None
             self.possible_moves.clear()
@@ -439,6 +515,9 @@ class ChessGUI(QMainWindow):
         self.board = chess.Board()
         self.selected_square = None
         self.possible_moves.clear()
+        self.captured_pieces = {'white': Counter(), 'black': Counter()}
+        self.white_captured.setText("White: ")
+        self.black_captured.setText("Black: ")
         self.update_board()
         self.update_turn_indicator()
         self.time = QTime(0, 0)  # Reset the timer
@@ -457,6 +536,9 @@ class ChessGUI(QMainWindow):
         self.board = chess.Board()
         self.selected_square = None
         self.possible_moves.clear()
+        self.captured_pieces = {'white': Counter(), 'black': Counter()}
+        self.white_captured.setText("White: ")
+        self.black_captured.setText("Black: ")
         
         # If player chose black, make AI play first move as white
         if msg.clickedButton() == black_button:
@@ -538,3 +620,12 @@ class ChessGUI(QMainWindow):
                     border-radius: 5px;
                 }
             """)
+
+    def __del__(self):
+        """Clean up Stockfish engine properly"""
+        if hasattr(self, 'engine') and self.engine:
+            try:
+                self.engine.quit()
+            except:
+                pass
+        super().__del__()  # Call parent's __del__ if it exists
