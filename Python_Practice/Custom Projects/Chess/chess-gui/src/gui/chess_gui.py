@@ -14,6 +14,9 @@ class ChessGUI(QMainWindow):
         super().__init__()
         self.game_mode = game_mode  # "AI" or "Player"
         
+        # Initialize board first
+        self.board = chess.Board()
+        
         # Define color constants first
         self.LIGHT_SQUARE = "#E8EDF9"    # Light blue-gray
         self.DARK_SQUARE = "#B7C0D8"     # Medium blue-gray
@@ -77,8 +80,7 @@ class ChessGUI(QMainWindow):
                     print(f"Error loading image {image_path}: {e}")
 
         self.setWindowTitle("Chess Game")
-        self.setFixedSize(QSize(800, 600))
-        self.board = chess.Board()
+        self.setFixedSize(QSize(1000, 600)) 
         
         # Initialize Stockfish with multiple possible paths
         stockfish_paths = [
@@ -169,24 +171,27 @@ class ChessGUI(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.grid_layout = QGridLayout()
-        self.grid_layout.setSpacing(0)  
-
+        self.grid_layout.setSpacing(0)
+        self.grid_layout.setContentsMargins(0, 0, 0, 0)
+        
         self.central_widget.setLayout(self.grid_layout)
         self.buttons = {}
 
         for i in range(8):
             for j in range(8):
                 button = QPushButton("")
-                button.setFixedSize(70, 70)
+                button.setFixedSize(72, 72)
                 color = self.get_square_color(i, j)
                 button.setStyleSheet(f"""
                     QPushButton {{
                         background-color: {color};
                         border: none;
+                        margin: 0;
+                        padding: 0;
+                        border-radius: 0;
                     }}
                     QPushButton:hover {{
                         background-color: {self.HOVER_COLOR};
-                        border: 2px solid #DAA520;
                     }}
                 """)
                 button.clicked.connect(lambda _, x=i, y=j: self.on_button_clicked(x, y))
@@ -272,35 +277,44 @@ class ChessGUI(QMainWindow):
         side_panel = QWidget()
         side_layout = QVBoxLayout()
         
-        # Add captured pieces display with styling
+        # Captured pieces styling
         captured_group = QGroupBox("Captured Pieces")
         captured_group.setStyleSheet("""
             QGroupBox {
                 font-weight: bold;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                margin-top: 10px;
-                padding: 5px;
+                border: 2px solid #34495e;
+                border-radius: 8px;
+                margin-top: 12px;
+                padding: 15px;
+                background-color: #f8f9fa;
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
-                left: 10px;
+                left: 15px;
+                padding: 0 10px;
+                color: #2C3E50;
+                font-size: 14px;
+                background-color: #f8f9fa;
             }
             QLabel {
                 font-size: 16px;
-                padding: 8px;
-                margin: 4px;
-                background-color: #f0f0f0;
-                border-radius: 3px;
-                min-height: 20px;
+                padding: 12px 15px;
+                margin: 6px;
+                background-color: #ffffff;
+                border: 1px solid #e0e0e0;
+                border-radius: 6px;
+                min-height: 30px;
+                color: #2C3E50;
+                font-weight: bold;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             }
         """)
         
         captured_layout = QVBoxLayout()
         self.white_captured = QLabel("White: ")
         self.black_captured = QLabel("Black: ")
-        self.white_captured.setMinimumWidth(180)
-        self.black_captured.setMinimumWidth(180)
+        self.white_captured.setMinimumWidth(400)  
+        self.black_captured.setMinimumWidth(400) 
         captured_layout.addWidget(self.white_captured)
         captured_layout.addWidget(self.black_captured)
         captured_group.setLayout(captured_layout)
@@ -325,7 +339,7 @@ class ChessGUI(QMainWindow):
         side_layout.addLayout(save_load_layout)
         
         side_panel.setLayout(side_layout)
-        side_panel.setFixedWidth(200)
+        side_panel.setFixedWidth(425)  
         
         # Create main layout
         main_widget = QWidget()
@@ -338,12 +352,13 @@ class ChessGUI(QMainWindow):
         # Update move history styling to support Unicode symbols
         self.move_list.setStyleSheet("""
             QListWidget {
-                font-size: 14px;
+                font-size: 16px;
                 font-family: Arial;
-                padding: 5px;
+                padding: 8px;
             }
             QListWidget::item {
-                padding: 3px;
+                padding: 5px;
+                margin: 2px;
             }
         """)
 
@@ -395,17 +410,17 @@ class ChessGUI(QMainWindow):
             
             # Update display for both sides
             for side in ['white', 'black']:
-                # Sort pieces by value
                 pieces_display = []
                 for piece_symbol in ['♚', '♛', '♜', '♝', '♞', '♟']:
                     count = self.captured_pieces[side][piece_symbol]
                     if count > 0:
-                        pieces_display.append(f"{piece_symbol}×{count}")
+                        pieces_display.append(f"{piece_symbol} × {count}")
                 
-                # Join all pieces with spaces and update label
-                pieces_str = " ".join(pieces_display)
+                # Enhanced formatting with emoji
+                prefix = "⚪" if side == 'white' else "⚫"
+                pieces_str = "   ".join(pieces_display)
                 label = self.white_captured if side == 'white' else self.black_captured
-                label.setText(f"{side.capitalize()}: {pieces_str}")
+                label.setText(f"{prefix} {side.capitalize()}: {pieces_str}")
 
     def on_button_clicked(self, i, j):
         square = chess.square(j, 7 - i)
@@ -520,7 +535,7 @@ class ChessGUI(QMainWindow):
                     piece_image = os.path.join(self.pieces_path, f"{color}_{piece_type}.png")
                     if os.path.exists(piece_image):
                         self.buttons[(i, j)].setIcon(QIcon(piece_image))
-                        self.buttons[(i, j)].setIconSize(QSize(60, 60))
+                        self.buttons[(i, j)].setIconSize(QSize(35, 35))  
                     else:
                         print(f"Missing image: {piece_image}")
                 else:
@@ -660,7 +675,7 @@ class ChessGUI(QMainWindow):
     def update_turn_indicator(self):
         """Update the status label to show current turn with dynamic styling"""
         current_turn = "White" if self.board.turn else "Black"
-        self.status_label.setText(f"Current Turn: {current_turn}")
+        self.status_label.setText(f"Player Move: {current_turn}")
         
         # Set background and text color based on current turn
         if self.board.turn:  # White's turn
@@ -668,7 +683,7 @@ class ChessGUI(QMainWindow):
                 QLabel {
                     background-color: #2C3E50;
                     color: white;
-                    font-size: 16px;
+                    font-size: 10px;
                     font-weight: bold;
                     padding: 5px 15px;
                     border-radius: 5px;
@@ -679,7 +694,7 @@ class ChessGUI(QMainWindow):
                 QLabel {
                     background-color: #ECF0F1;
                     color: #2C3E50;
-                    font-size: 16px;
+                    font-size: 12px;
                     font-weight: bold;
                     padding: 5px 15px;
                     border-radius: 5px;
@@ -694,3 +709,4 @@ class ChessGUI(QMainWindow):
             except:
                 pass
         super().__del__()  # Call parent's __del__ if it exists
+
