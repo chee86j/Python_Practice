@@ -92,12 +92,21 @@ class ChessGUI(QMainWindow):
             "stockfish"  # System PATH
         ]
 
+        try:
+            if hasattr(self, 'engine') and self.engine:
+                self.engine.quit()
+        except:
+            pass
+            
         self.engine = None
         for path in stockfish_paths:
             try:
-                self.engine = Stockfish(path=path, depth=10)  # Add depth parameter
+                self.engine = Stockfish(path=path, depth=10)
+                # Verify engine is working
+                self.engine.get_parameters()
                 break
-            except Exception:
+            except Exception as e:
+                print(f"Failed to initialize Stockfish at {path}: {e}")
                 continue
 
         if self.engine is None:
@@ -401,10 +410,13 @@ class ChessGUI(QMainWindow):
     def update_captured_pieces(self, captured_piece):
         """Update captured pieces display"""
         if captured_piece:
-            # Determine which side captured the piece
-            capturing_color = 'white' if not captured_piece.color else 'black'
+            # Get the color of the captured piece and update the opposite side's captures
+            if captured_piece.color:  # If the captured piece is white
+                capturing_side = 'black'
+            else:  # If the captured piece is black
+                capturing_side = 'white'
             
-            # Map piece type to symbol
+            # Get the symbol for the captured piece
             piece_symbols = {
                 chess.PAWN: '♟',
                 chess.KNIGHT: '♞',
@@ -413,24 +425,26 @@ class ChessGUI(QMainWindow):
                 chess.QUEEN: '♛',
                 chess.KING: '♚'
             }
-            symbol = piece_symbols[captured_piece.piece_type]
+            captured_symbol = piece_symbols[captured_piece.piece_type]
             
-            # Update counter
-            self.captured_pieces[capturing_color][symbol] += 1
+            # Update the capturing side's counter
+            self.captured_pieces[capturing_side][captured_symbol] += 1
             
-            # Update display for both sides
-            for side in ['white', 'black']:
-                pieces_display = []
-                for piece_symbol in ['♚', '♛', '♜', '♝', '♞', '♟']:
-                    count = self.captured_pieces[side][piece_symbol]
-                    if count > 0:
-                        pieces_display.append(f"{piece_symbol} × {count}")
-                
-                # Enhanced formatting with emoji
-                prefix = "⚪" if side == 'white' else "⚫"
-                pieces_str = "   ".join(pieces_display)
-                label = self.white_captured if side == 'white' else self.black_captured
-                label.setText(f"{prefix} {side.capitalize()}: {pieces_str}")
+            # Format and display white's captures
+            white_captures = []
+            for symbol in ['♚', '♛', '♜', '♝', '♞', '♟']:
+                count = self.captured_pieces['white'][symbol]
+                if count > 0:
+                    white_captures.append(f"{symbol}×{count}")
+            self.white_captured.setText(f"⚪ White Captures: {' '.join(white_captures)}")
+            
+            # Format and display black's captures
+            black_captures = []
+            for symbol in ['♚', '♛', '♜', '♝', '♞', '♟']:
+                count = self.captured_pieces['black'][symbol]
+                if count > 0:
+                    black_captures.append(f"{symbol}×{count}")
+            self.black_captured.setText(f"⚫ Black Captures: {' '.join(black_captures)}")
 
     def on_button_clicked(self, i, j):
         square = chess.square(j, 7 - i)
@@ -444,42 +458,60 @@ class ChessGUI(QMainWindow):
             # Second click - try to make a move
             if square in self.possible_moves:
                 move = chess.Move(self.selected_square, square)
-                
-                # First update history (before making the move)
-                self.update_move_history(move)
-                
-                # Check for capture before making move
-                captured_piece = self.board.piece_at(square)
-                
-                # Make the move
-                self.board.push(move)
-                
-                if captured_piece:
-                    self.update_captured_pieces(captured_piece)
-                
-                self.move_stack.append(move)
-                self.update_board()
-                self.update_turn_indicator()
-                
-                # Check game state after each move
-                self.check_game_state()
-                
-                # Handle game over and AI moves
-                if not self.board.is_game_over() and self.game_mode == "AI":
-                    ai_move = self.get_ai_move()
-                    if ai_move:
-                        # Check for AI capture before making move
-                        ai_captured = self.board.piece_at(ai_move.to_square)
-                        self.board.push(ai_move)
-                        self.move_stack.append(ai_move)
-                        if ai_captured:
-                            self.update_captured_pieces(ai_captured)
-                        self.check_game_state()  # Check state after AI move
-                
+                try:
+                    # Get information about potential capture before making the move
+                    captured_piece = self.board.piece_at(square)
+                    
+                    # Make the move
+                    if move in self.board.legal_moves:
+                        self.board.push(move)
+                        
+                        # Handle the capture if there was one
+                        if captured_piece:
+                            self.update_captured_pieces(captured_piece)
+                        
+                        # Update move history and continue with the game
+                        self.update_move_history(move)
+                        self.move_stack.append(move)
+                        self.update_board()
+                        self.update_turn_indicator()
+                        
+                        # Check game state and handle AI moves
+                        self.check_game_state()
+                        if not self.board.is_game_over() and self.game_mode == "AI":
+                            self.make_ai_move()
+                except Exception as e:
+                    print(f"Error processing move: {e}")
+            
             # Reset selection and highlights
             self.selected_square = None
             self.possible_moves.clear()
             self.update_board()
+
+    def make_ai_move(self):
+        """Handle AI move with proper error checking"""
+        try:
+            ai_move = self.get_ai_move()
+            if ai_move and ai_move in self.board.legal_moves:
+                # Get capture info before making move
+                captured = self.board.piece_at(ai_move.to_square)
+                
+                # Make the move
+                self.board.push(ai_move)
+                
+                # Update move history
+                self.update_move_history(ai_move)
+                
+                # Handle capture if any
+                if captured:
+                    self.update_captured_pieces(captured)
+                
+                self.move_stack.append(ai_move)
+                self.update_board()
+                self.update_turn_indicator()
+                self.check_game_state()
+        except Exception as e:
+            print(f"Error making AI move: {e}")
 
     def ai_move(self):
         move = self.get_ai_move()
@@ -575,34 +607,39 @@ class ChessGUI(QMainWindow):
             if dialog.exec() == QDialog.DialogCode.Accepted:
                 self.restart_game()
 
+    # Determine why the game has ended by applying standard chess rules:
+# - Checkmate: The player's king is under threat with no escape moves, so the opponent wins.
+# - Stalemate: The current player has no legal moves, but their king is not in check, resulting in a draw.
+# - Insufficient Material: There aren’t enough pieces remaining to force a checkmate, so the game is drawn.
+# - Fifty Moves Rule: If fifty consecutive moves occur without a pawn move or a capture, the game is drawn.
+# - Threefold Repetition: If the same board position occurs three times, the game is drawn.
+
     def check_game_state(self):
-        """Check if the game is over or in check"""
-        if self.board.is_game_over():
-            self.show_game_over_message()
-        elif self.board.is_check():
-            msg = QMessageBox(self)
-            msg.setWindowTitle("Check!")
-            msg.setText("Your King is in Check!")
-            msg.setIcon(QMessageBox.Icon.Warning)
-            msg.setStyleSheet("""
-                QMessageBox {
-                    background-color: #1a1a1a;
-                }
-                QMessageBox QLabel {
-                    color: #ff3b30;
-                    font-size: 14px;
-                    font-weight: bold;
-                    min-width: 200px;
-                }
-                QPushButton {
-                    background-color: #34c759;
-                    color: white;
-                    border-radius: 6px;
-                    padding: 8px 16px;
-                    font-size: 12px;
-                }
-            """)
-            msg.exec()
+        """Check the game state and handle game over conditions"""
+        # Check if current player has no legal moves
+        has_legal_moves = any(self.board.legal_moves)
+        is_in_check = self.board.is_check()
+
+        if not has_legal_moves:
+            self.stop_timer()
+            if is_in_check:  # Checkmate - current player lost
+                loser = "White" if self.board.turn else "Black"
+                winner = "Black" if self.board.turn else "White"
+                title = "Checkmate!"
+                message = f"{winner} is Victorious!\n{loser} has been defeated!"
+            else:  # Stalemate
+                title = "Stalemate!"
+                message = "The game is a draw!"
+            
+            dialog = GameOverDialog(title, message, self)
+            result = dialog.exec()
+            
+            if result == QDialog.DialogCode.Accepted:
+                if dialog.choice == "new_game":
+                    self.new_game()
+                else:  # Return to menu
+                    self.close()
+                    self.show_start_menu()
 
     def restart_game(self):
         """Restart the current game"""
@@ -721,7 +758,7 @@ class ChessGUI(QMainWindow):
     def update_turn_indicator(self):
         """Update the status label to show current turn with dynamic styling"""
         current_turn = "White" if self.board.turn else "Black"
-        self.status_label.setText(f"Player Move: {current_turn}")
+        self.status_label.setText(f"Player: {current_turn}")
         
         # Set background and text color based on current turn
         if self.board.turn:  # White's turn
@@ -749,10 +786,12 @@ class ChessGUI(QMainWindow):
 
     def __del__(self):
         """Clean up Stockfish engine properly"""
-        if hasattr(self, 'engine') and self.engine:
-            try:
+        try:
+            if hasattr(self, 'engine') and self.engine:
                 self.engine.quit()
-            except:
-                pass
+        except Exception as e:
+            print(f"Error cleaning up Stockfish: {e}")
         super().__del__()  # Call parent's __del__ if it exists
+
+
 

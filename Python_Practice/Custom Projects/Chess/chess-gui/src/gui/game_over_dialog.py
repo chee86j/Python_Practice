@@ -7,21 +7,15 @@ class GameOverDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Game Over")
         self.setFixedSize(500, 300)
-        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)  # Keep dialog on top
+        self.setModal(True)  # Make dialog modal
+        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowTitleHint)
         
-        # Set window style
-        self.setStyleSheet("""
+        # Enhanced styling for different game over scenarios
+        base_style = """
             QDialog {
                 background-color: #1a1a1a;
             }
-            QLabel#title {
-                color: #ff3b30;
-                font-size: 48px;
-                font-weight: bold;
-                padding: 25px;
-                margin: 10px;
-            }
-            QLabel#message {
+            QLabel {
                 color: #ffffff;
                 font-size: 28px;
                 padding: 15px;
@@ -42,38 +36,65 @@ class GameOverDialog(QDialog):
                 background-color: #30d158;
                 transform: scale(1.05);
             }
-            QPushButton:pressed {
-                background-color: #248a3d;
-            }
-        """)
-
+        """
+        
+        # Add specific styling based on game outcome
+        if "Checkmate" in title:
+            title_color = "#ff3b30"  # Red for checkmate
+        elif "Draw" in title or "Stalemate" in title:
+            title_color = "#ffcc00"  # Yellow for draws
+        else:
+            title_color = "#34c759"  # Green for other cases
+        
+        self.setStyleSheet(base_style)
+        
         layout = QVBoxLayout()
         
-        # Title label
+        # Title with specific styling
         title_label = QLabel(title)
-        title_label.setObjectName("title")
+        title_label.setStyleSheet(f"""
+            font-size: 48px;
+            font-weight: bold;
+            color: {title_color};
+            padding: 25px;
+            margin: 10px;
+        """)
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        # Message label
+        # Message
         message_label = QLabel(message)
-        message_label.setObjectName("message")
         message_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         layout.addWidget(title_label)
         layout.addWidget(message_label)
         layout.addStretch()
         
-        # Button container for centering
+        # Button container
         button_container = QWidget()
         button_layout = QVBoxLayout()
         
-        # Play Again button
-        restart_button = QPushButton("Play Again")
-        restart_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        restart_button.clicked.connect(self.accept)
+        # New Game button
+        new_game_btn = QPushButton("New Game")
+        new_game_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        new_game_btn.clicked.connect(lambda: self.make_choice("new_game"))
         
-        button_layout.addWidget(restart_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        # Return to Main Menu button
+        menu_btn = QPushButton("Return to Main Menu")
+        menu_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        menu_btn.clicked.connect(lambda: self.make_choice("menu"))
+        
+        button_layout.addWidget(new_game_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        button_layout.addWidget(menu_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         button_container.setLayout(button_layout)
         layout.addWidget(button_container)
         
         self.setLayout(layout)
+    
+    def make_choice(self, choice):
+        """Store the user's choice and close dialog"""
+        self.choice = choice
+        self.accept()
+
+    def closeEvent(self, event):
+        """Prevent dialog from being closed except through buttons"""
+        event.ignore()
