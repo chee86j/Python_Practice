@@ -148,6 +148,17 @@ class ChessGUI(QMainWindow):
             'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'   # Black pieces
         }
         
+        # Add piece size constants based on classical Staunton Design proportions
+        base_size = 35  # Base size for pawn
+        self.PIECE_SIZES = {
+            'pawn': base_size,
+            'rook': int(base_size * 1.05),
+            'knight': int(base_size * 1.3),
+            'bishop': int(base_size * 1.55),
+            'queen': int(base_size * 1.8),
+            'king': int(base_size * 2.05)
+        }
+        
         self.initUI()
         self.create_toolbar()
         self.create_side_panel()
@@ -306,7 +317,6 @@ class ChessGUI(QMainWindow):
                 min-height: 30px;
                 color: #2C3E50;
                 font-weight: bold;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             }
         """)
         
@@ -451,10 +461,11 @@ class ChessGUI(QMainWindow):
                 self.update_board()
                 self.update_turn_indicator()
                 
+                # Check game state after each move
+                self.check_game_state()
+                
                 # Handle game over and AI moves
-                if self.board.is_game_over():
-                    self.show_game_over_message()
-                elif self.game_mode == "AI":
+                if not self.board.is_game_over() and self.game_mode == "AI":
                     ai_move = self.get_ai_move()
                     if ai_move:
                         # Check for AI capture before making move
@@ -463,6 +474,7 @@ class ChessGUI(QMainWindow):
                         self.move_stack.append(ai_move)
                         if ai_captured:
                             self.update_captured_pieces(ai_captured)
+                        self.check_game_state()  # Check state after AI move
                 
             # Reset selection and highlights
             self.selected_square = None
@@ -533,30 +545,64 @@ class ChessGUI(QMainWindow):
                     }[piece.piece_type]
                     
                     piece_image = os.path.join(self.pieces_path, f"{color}_{piece_type}.png")
-                    if os.path.exists(piece_image):
+                    if (os.path.exists(piece_image)):
                         self.buttons[(i, j)].setIcon(QIcon(piece_image))
-                        self.buttons[(i, j)].setIconSize(QSize(35, 35))  
+                        # Set size based on piece type
+                        size = self.PIECE_SIZES[piece_type]
+                        self.buttons[(i, j)].setIconSize(QSize(size, size))
                     else:
                         print(f"Missing image: {piece_image}")
                 else:
                     self.buttons[(i, j)].setIcon(QIcon())
 
     def show_game_over_message(self):
-        self.stop_timer()  # Stop the timer when the game is over
         """Show styled game over message with the result"""
-        if self.board.is_checkmate():
-            if self.board.turn:  # Black won (player lost)
-                message = "Checkmate! You Lost!"
-            else:  # White won (player won)
-                message = "Checkmate! You Win!"
-        elif self.board.is_stalemate():
-            message = "Draw - Stalemate!"
-        elif self.board.is_insufficient_material():
-            message = "Draw - Insufficient Material!"
+        self.stop_timer()  # Stop the timer when the game is over
         
-        dialog = GameOverDialog(message, self)
-        if dialog.exec() == QDialog.Accepted:
-            self.restart_game()
+        if self.board.is_checkmate():
+            winner = "Black" if self.board.turn else "White"
+            title = "Checkmate!"
+            message = f"{winner} Wins the Game!"
+            dialog = GameOverDialog(title, message, self)
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                self.restart_game()
+        elif self.board.is_stalemate():
+            dialog = GameOverDialog("Stalemate!", "The Game is a Draw!", self)
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                self.restart_game()
+        elif self.board.is_insufficient_material():
+            dialog = GameOverDialog("Draw!", "Insufficient Material to Continue", self)
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                self.restart_game()
+
+    def check_game_state(self):
+        """Check if the game is over or in check"""
+        if self.board.is_game_over():
+            self.show_game_over_message()
+        elif self.board.is_check():
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Check!")
+            msg.setText("Your King is in Check!")
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.setStyleSheet("""
+                QMessageBox {
+                    background-color: #1a1a1a;
+                }
+                QMessageBox QLabel {
+                    color: #ff3b30;
+                    font-size: 14px;
+                    font-weight: bold;
+                    min-width: 200px;
+                }
+                QPushButton {
+                    background-color: #34c759;
+                    color: white;
+                    border-radius: 6px;
+                    padding: 8px 16px;
+                    font-size: 12px;
+                }
+            """)
+            msg.exec()
 
     def restart_game(self):
         """Restart the current game"""
