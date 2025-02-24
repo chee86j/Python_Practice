@@ -8,6 +8,16 @@ from stockfish import Stockfish
 from .game_over_dialog import GameOverDialog
 from .start_menu import StartMenu  # Add this import
 from collections import Counter
+import logging
+import platform
+from pathlib import Path
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class ChessGUI(QMainWindow):
     def __init__(self, game_mode):
@@ -101,9 +111,11 @@ class ChessGUI(QMainWindow):
         self.engine = None
         for path in stockfish_paths:
             try:
-                self.engine = Stockfish(path=path, depth=10)
-                # Verify engine is working
-                self.engine.get_parameters()
+                print(f"Trying Stockfish path: {path}")
+                self.engine = Stockfish(path=path)
+                # Test if engine is working
+                self.engine.get_board_visual()
+                print(f"Successfully initialized Stockfish at: {path}")
                 break
             except Exception as e:
                 print(f"Failed to initialize Stockfish at {path}: {e}")
@@ -458,30 +470,41 @@ class ChessGUI(QMainWindow):
             # Second click - try to make a move
             if square in self.possible_moves:
                 move = chess.Move(self.selected_square, square)
-                try:
-                    # Get information about potential capture before making the move
-                    captured_piece = self.board.piece_at(square)
-                    
-                    # Make the move
-                    if move in self.board.legal_moves:
-                        self.board.push(move)
-                        
-                        # Handle the capture if there was one
-                        if captured_piece:
-                            self.update_captured_pieces(captured_piece)
-                        
-                        # Update move history and continue with the game
-                        self.update_move_history(move)
-                        self.move_stack.append(move)
+                
+                # First update history (before making the move)
+                self.update_move_history(move)
+                
+                # Check for capture before making move
+                captured_piece = self.board.piece_at(square)
+                
+                # Make the move
+                self.board.push(move)
+                
+                if captured_piece:
+                    self.update_captured_pieces(captured_piece)
+                
+                self.move_stack.append(move)
+                self.update_board()
+                self.update_turn_indicator()
+                
+                # Handle game over and AI moves
+                if self.board.is_game_over():
+                    self.show_game_over_message()
+                elif self.game_mode == "AI":
+                    ai_move = self.get_ai_move()
+                    if ai_move:
+                        # Check for AI capture before making move
+                        ai_captured = self.board.piece_at(ai_move.to_square)
+                        # Update history before making AI move
+                        self.update_move_history(ai_move)
+                        self.board.push(ai_move)
+                        self.move_stack.append(ai_move)
+                        if ai_captured:
+                            self.update_captured_pieces(ai_captured)
                         self.update_board()
                         self.update_turn_indicator()
-                        
-                        # Check game state and handle AI moves
-                        self.check_game_state()
-                        if not self.board.is_game_over() and self.game_mode == "AI":
-                            self.make_ai_move()
-                except Exception as e:
-                    print(f"Error processing move: {e}")
+                        if self.board.is_game_over():
+                            self.show_game_over_message()
             
             # Reset selection and highlights
             self.selected_square = None
@@ -516,10 +539,12 @@ class ChessGUI(QMainWindow):
     def ai_move(self):
         move = self.get_ai_move()
         if move:
+            # Update history before making the move
+            self.update_move_history(move)
             self.board.push(move)
-            self.move_stack.append(move)  # Track the AI move
+            self.move_stack.append(move)
             self.update_board()
-            self.update_turn_indicator()  # Add this line
+            self.update_turn_indicator()
             if self.board.is_game_over():
                 self.show_game_over_message()
 

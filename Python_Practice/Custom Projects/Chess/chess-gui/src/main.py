@@ -14,3 +14,12 @@ if __name__ == "__main__":
     
     show_start_menu()
     sys.exit(app.exec())
+
+#   Before starting the game make sure to install the dependencies by running 
+#   the requirements.txt file in the terminal starting from the root directory
+#   of the project in the terminal:
+
+#   `pip install -r requirements.txt`
+
+
+
