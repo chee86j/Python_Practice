@@ -1,6 +1,10 @@
 import os
 import sys
-from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout, QPushButton, QToolBar, QHBoxLayout, QLabel, QVBoxLayout, QGroupBox, QListWidget, QMessageBox, QDialog, QFileDialog
+from PyQt6.QtWidgets import (
+    QMainWindow, QWidget, QGridLayout, QPushButton, QToolBar, 
+    QHBoxLayout, QLabel, QVBoxLayout, QGroupBox, QListWidget, 
+    QMessageBox, QDialog, QFileDialog
+)
 from PyQt6.QtCore import QSize, Qt, QTimer, QTime
 from PyQt6.QtGui import QIcon
 import chess
@@ -11,6 +15,8 @@ from collections import Counter
 import logging
 import platform
 from pathlib import Path
+import json
+from .replay_dialog import ReplayDialog
 
 # Configure logging
 logging.basicConfig(
@@ -233,14 +239,13 @@ class ChessGUI(QMainWindow):
         self.update_board()  # Move out of the loop
 
     def highlight_possible_moves(self, square):
-        """Get all legal moves for the selected piece"""
+        """Get all legal moves for the selected piece with validation"""
         self.possible_moves = set()
         if square is not None:
             for move in self.board.legal_moves:
                 if move.from_square == square:
                     self.possible_moves.add(move.to_square)
-        self.update_board()  # Update the board to show possible moves
-
+        self.update_board()
 
     def create_toolbar(self):
         toolbar = QToolBar("Game Controls", self)
@@ -394,30 +399,33 @@ class ChessGUI(QMainWindow):
         """)
 
     def update_move_history(self, move):
-        """Update move history display with conventional chess notation and Unicode symbols"""
+        """Update move history display with proper error handling"""
         try:
-            move_text = self.board.san(move)  # Get standard algebraic notation
-            
-            # Piece letters with Unicode symbols
-            for piece_letter, symbol in self.piece_symbols.items():
-                if piece_letter.isupper():  # Only replace uppercase pieces (white)
-                    move_text = move_text.replace(piece_letter, symbol)
-            
-            # For white's move (even number of moves in history)
-            if len(self.move_history) % 2 == 0:
-                item_text = f"{self.current_move_number}. {move_text}"
-                self.move_list.addItem(item_text)
-            else:
-                # For black's move, append to the current line
-                current_item = self.move_list.item(self.move_list.count() - 1)
-                current_text = current_item.text()
-                current_item.setText(f"{current_text}  {move_text}")
-                self.current_move_number += 1
-            
-            self.move_history.append(move_text)
-            self.move_list.scrollToBottom()
+            if move in self.board.legal_moves:
+                move_text = self.board.san(move)  # Get standard algebraic notation
+                
+                # Replace piece letters with Unicode symbols
+                for piece_letter, symbol in self.piece_symbols.items():
+                    if piece_letter.isupper():  # Only replace uppercase pieces (white)
+                        move_text = move_text.replace(piece_letter, symbol)
+                
+                # For white's move (even number of moves in history)
+                if len(self.move_history) % 2 == 0:
+                    item_text = f"{self.current_move_number}. {move_text}"
+                    self.move_list.addItem(item_text)
+                else:
+                    # For black's move, append to the current line
+                    current_item = self.move_list.item(self.move_list.count() - 1)
+                    if current_item:
+                        current_text = current_item.text()
+                        current_item.setText(f"{current_text}  {move_text}")
+                        self.current_move_number += 1
+                
+                self.move_history.append(move_text)
+                self.move_list.scrollToBottom()
         except Exception as e:
-            print(f"Error updating move history: {e}")
+            logger.error(f"Error updating move history: {e}")
+            raise
 
     def update_captured_pieces(self, captured_piece):
         """Update captured pieces display"""
@@ -459,54 +467,56 @@ class ChessGUI(QMainWindow):
             self.black_captured.setText(f"⚫ Black Captures: {' '.join(black_captures)}")
 
     def on_button_clicked(self, i, j):
-        square = chess.square(j, 7 - i)
-        if self.selected_square is None:
-            # First click - select a piece
-            piece = self.board.piece_at(square)
-            if piece and piece.color == self.board.turn:
-                self.selected_square = square
-                self.highlight_possible_moves(square)
-        else:
-            # Second click - try to make a move
-            if square in self.possible_moves:
+        """Handle chess piece movement with proper validation"""
+        try:
+            square = chess.square(j, 7 - i)
+            
+            if self.selected_square is None:
+                # First click - select a piece
+                piece = self.board.piece_at(square)
+                if piece and piece.color == self.board.turn:
+                    self.selected_square = square
+                    self.highlight_possible_moves(square)
+            else:
+                # Second click - try to make a move
                 move = chess.Move(self.selected_square, square)
                 
-                # First update history (before making the move)
-                self.update_move_history(move)
+                # Validate move before attempting to make it
+                if move in self.board.legal_moves:
+                    # Get capture info before making move
+                    captured_piece = self.board.piece_at(square)
+                    
+                    # Update move history before making the move
+                    try:
+                        self.update_move_history(move)
+                    except Exception as e:
+                        logger.error(f"Error updating move history: {e}")
+                    
+                    # Make the move
+                    self.board.push(move)
+                    self.move_stack.append(move)
+                    
+                    # Update captured pieces if any
+                    if captured_piece:
+                        self.update_captured_pieces(captured_piece)
+                    
+                    self.update_board()
+                    self.update_turn_indicator()
+                    
+                    # Handle game over and AI moves
+                    if self.board.is_game_over():
+                        self.show_game_over_message()
+                    elif self.game_mode == "AI" and not self.board.is_game_over():
+                        # AI's turn
+                        self.make_ai_move()
                 
-                # Check for capture before making move
-                captured_piece = self.board.piece_at(square)
-                
-                # Make the move
-                self.board.push(move)
-                
-                if captured_piece:
-                    self.update_captured_pieces(captured_piece)
-                
-                self.move_stack.append(move)
+                # Reset selection and highlights
+                self.selected_square = None
+                self.possible_moves.clear()
                 self.update_board()
-                self.update_turn_indicator()
-                
-                # Handle game over and AI moves
-                if self.board.is_game_over():
-                    self.show_game_over_message()
-                elif self.game_mode == "AI":
-                    ai_move = self.get_ai_move()
-                    if ai_move:
-                        # Check for AI capture before making move
-                        ai_captured = self.board.piece_at(ai_move.to_square)
-                        # Update history before making AI move
-                        self.update_move_history(ai_move)
-                        self.board.push(ai_move)
-                        self.move_stack.append(ai_move)
-                        if ai_captured:
-                            self.update_captured_pieces(ai_captured)
-                        self.update_board()
-                        self.update_turn_indicator()
-                        if self.board.is_game_over():
-                            self.show_game_over_message()
             
-            # Reset selection and highlights
+        except Exception as e:
+            logger.error(f"Error in on_button_clicked: {e}")
             self.selected_square = None
             self.possible_moves.clear()
             self.update_board()
@@ -635,7 +645,7 @@ class ChessGUI(QMainWindow):
     # Determine why the game has ended by applying standard chess rules:
 # - Checkmate: The player's king is under threat with no escape moves, so the opponent wins.
 # - Stalemate: The current player has no legal moves, but their king is not in check, resulting in a draw.
-# - Insufficient Material: There aren’t enough pieces remaining to force a checkmate, so the game is drawn.
+# - Insufficient Material: There aren't enough pieces remaining to force a checkmate, so the game is drawn.
 # - Fifty Moves Rule: If fifty consecutive moves occur without a pawn move or a capture, the game is drawn.
 # - Threefold Repetition: If the same board position occurs three times, the game is drawn.
 
@@ -762,23 +772,128 @@ class ChessGUI(QMainWindow):
             new_window.show()
 
     def save_game(self):
-        """Save the current game state to a file"""
-        options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getSaveFileName(self, "Save Game", "", "Chess Files (*.chess);;All Files (*)", options=options)
-        if file_path:
-            with open(file_path, 'w') as file:
-                file.write(self.board.fen())
+        """Save the current game state and move history to a file"""
+        try:
+            # Get the file path using QFileDialog
+            file_path, _ = QFileDialog.getSaveFileName(
+                self,
+                "Save Game",
+                "",  # Default directory
+                "Chess Files (*.chess)",  # File type filter
+                options=QFileDialog.Option.DontUseNativeDialog
+            )
+            
+            if file_path:
+                # Ensure the file has .chess extension
+                if not file_path.endswith('.chess'):
+                    file_path += '.chess'
+                
+                # Create game data dictionary
+                game_data = {
+                    'fen': self.board.fen(),
+                    'moves': [move.uci() for move in self.board.move_stack],
+                    'game_mode': self.game_mode,
+                    'move_history': self.move_history,
+                    'current_move_number': self.current_move_number,
+                    'time': self.time.toString('mm:ss'),
+                    'captured_pieces': {
+                        'white': {str(k): v for k, v in self.captured_pieces['white'].items()},
+                        'black': {str(k): v for k, v in self.captured_pieces['black'].items()}
+                    }
+                }
+                
+                # Save to file using json
+                with open(file_path, 'w', encoding='utf-8') as file:
+                    json.dump(game_data, file, ensure_ascii=False, indent=4)
+                
+                # Show success message
+                QMessageBox.information(
+                    self,
+                    "Success",
+                    "Game saved successfully!",
+                    QMessageBox.StandardButton.Ok
+                )
+                
+        except Exception as e:
+            # Show error message
+            QMessageBox.critical(
+                self,
+                "Error",
+                f"Failed to save game: {str(e)}",
+                QMessageBox.StandardButton.Ok
+            )
+            logger.error(f"Error saving game: {e}")
 
     def load_game(self):
         """Load a game state from a file"""
-        options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, "Load Game", "", "Chess Files (*.chess);;All Files (*)", options=options)
-        if file_path:
-            with open(file_path, 'r') as file:
-                fen = file.read()
-                self.board.set_fen(fen)
-                self.update_board()
-                self.update_turn_indicator()
+        try:
+            # Get the file path using QFileDialog
+            file_path, _ = QFileDialog.getOpenFileName(
+                self,
+                "Load Game",
+                "",  # Default directory
+                "Chess Files (*.chess)",  # File type filter
+                options=QFileDialog.Option.DontUseNativeDialog
+            )
+            
+            if file_path:
+                # Read the file
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    game_data = json.load(file)
+                
+                # Ask if user wants to replay or continue
+                replay = QMessageBox.question(
+                    self,
+                    "Load Game",
+                    "Would you like to replay this game?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                )
+                
+                if replay == QMessageBox.StandardButton.Yes:
+                    # Create replay dialog with the moves
+                    moves = [chess.Move.from_uci(move) for move in game_data['moves']]
+                    replay_dialog = ReplayDialog(moves, self)
+                    replay_dialog.exec()
+                else:
+                    # Load the final position
+                    self.board.set_fen(game_data['fen'])
+                    self.game_mode = game_data.get('game_mode', 'Player')
+                    self.move_history = game_data.get('move_history', [])
+                    self.current_move_number = game_data.get('current_move_number', 1)
+                    
+                    # Load captured pieces
+                    if 'captured_pieces' in game_data:
+                        self.captured_pieces = {
+                            'white': {eval(k): v for k, v in game_data['captured_pieces']['white'].items()},
+                            'black': {eval(k): v for k, v in game_data['captured_pieces']['black'].items()}
+                        }
+                    
+                    # Reset game state
+                    self.selected_square = None
+                    self.possible_moves.clear()
+                    self.move_list.clear()
+                    
+                    # Update display
+                    self.update_board()
+                    self.update_turn_indicator()
+                    
+                    # Show success message
+                    QMessageBox.information(
+                        self,
+                        "Success",
+                        "Game loaded successfully!",
+                        QMessageBox.StandardButton.Ok
+                    )
+                    
+        except Exception as e:
+            # Show error message
+            QMessageBox.critical(
+                self,
+                "Error",
+                f"Failed to load game: {str(e)}",
+                QMessageBox.StandardButton.Ok
+            )
+            logger.error(f"Error loading game: {e}")
 
     def update_turn_indicator(self):
         """Update the status label to show current turn with dynamic styling"""

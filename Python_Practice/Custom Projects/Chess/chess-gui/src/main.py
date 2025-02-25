@@ -9,8 +9,10 @@ if __name__ == "__main__":
     def show_start_menu():
         start_menu = StartMenu()
         if start_menu.exec() == QDialog.DialogCode.Accepted:
-            window = ChessGUI(start_menu.game_mode)
-            window.show()
+            if start_menu.game_mode != "Replay":  # Only create window for non-replay modes
+                window = ChessGUI(start_menu.game_mode)
+                window.show()
+            # For replay mode, the replay dialog is handled in StartMenu
     
     show_start_menu()
     sys.exit(app.exec())
