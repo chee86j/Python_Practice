@@ -18,179 +18,208 @@ from pathlib import Path
 import json
 from .replay_dialog import ReplayDialog
 
-# Configure logging
+# Enhance logging configuration
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('chess_gui.log')
+    ]
 )
 logger = logging.getLogger(__name__)
 
+class ChessError(Exception):
+    """Base exception class for chess-related errors"""
+    pass
+
+class StockfishError(ChessError):
+    """Exception for Stockfish engine errors"""
+    pass
+
+class GameStateError(ChessError):
+    """Exception for invalid game state errors"""
+    pass
+
 class ChessGUI(QMainWindow):
     def __init__(self, game_mode):
-        super().__init__()
-        self.game_mode = game_mode  # "AI" or "Player"
-        
-        # Initialize board first
-        self.board = chess.Board()
-        
-        # Define color constants first
-        self.LIGHT_SQUARE = "#E8EDF9"    # Light blue-gray
-        self.DARK_SQUARE = "#B7C0D8"     # Medium blue-gray
-        self.SELECTED_COLOR = "#4A90E2"   # Bright blue
-        self.POSSIBLE_MOVE_COLOR = "#32CD32"  # Green for possible moves
-        self.HOVER_COLOR = "#5E81AC"      # Dark blue
-        
-        # Add style constants
-        self.BUTTON_STYLE = """
-            QPushButton {
-                background-color: #4C566A;
-                color: white;
-                border: none;
-                border-radius: 3px;
-                padding: 5px 10px;
-                font-size: 11px;
-                font-weight: bold;
-                min-width: 80px;
-                margin: 2px;
-            }
-            QPushButton:hover {
-                background-color: #5E81AC;
-            }
-            QPushButton:pressed {
-                background-color: #81A1C1;
-            }
-        """
-        
-        self.LABEL_STYLE = """
-            QLabel {
-                color: #2C3E50;
-                font-size: 11px;
-                font-weight: bold;
-                padding: 4px 8px;
-                background-color: #ECF0F1;
-                border-radius: 3px;
-                min-width: 100px;
-                qproperty-alignment: AlignCenter;
-            }
-        """
-        
-        # Track selected piece and possible moves
-        self.selected_square = None
-        self.possible_moves = set()
-        
-        # Remove pygame-related code
-        self.SQUARE_SIZE = 80
-        
-        # Define the base path for piece images
-        self.pieces_path = os.path.join(os.path.dirname(__file__), "..", "assets", "pieces")
-        
-        # Load piece images
-        self.pieces = {}
-        for color in ['white', 'black']:
-            for piece in ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king']:
-                image_path = os.path.join(self.pieces_path, f"{color}_{piece}.png")
-                try:
-                    # No need for pygame image loading
-                    self.pieces[f"{color}_{piece}"] = image_path
-                except Exception as e:
-                    print(f"Error loading image {image_path}: {e}")
-
-        self.setWindowTitle("Chess Game")
-        self.setFixedSize(QSize(1000, 600)) 
-        
-        # Initialize Stockfish with multiple possible paths
-        stockfish_paths = [
-            "C:/Users/Admin/Downloads/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
-            "C:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
-            "C:/Users/JChee/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
-            "/usr/local/bin/stockfish",  # macOS Homebrew
-            "/usr/bin/stockfish",        # Linux
-            "stockfish"  # System PATH
-        ]
-
         try:
-            if hasattr(self, 'engine') and self.engine:
-                self.engine.quit()
-        except:
-            pass
+            super().__init__()
+            logger.info(f"🎮 Initializing ChessGUI with game mode: {game_mode}")
             
-        self.engine = None
-        for path in stockfish_paths:
+            # Validate game mode
+            if game_mode not in ["Player", "AI"]:
+                raise ValueError(f"❌ Invalid game mode: {game_mode}")
+            
+            self.game_mode = game_mode
+            
+            # Initialize board first
+            self.board = chess.Board()
+            
+            # Define color constants first
+            self.LIGHT_SQUARE = "#E8EDF9"    # Light blue-gray
+            self.DARK_SQUARE = "#B7C0D8"     # Medium blue-gray
+            self.SELECTED_COLOR = "#4A90E2"   # Bright blue
+            self.POSSIBLE_MOVE_COLOR = "#32CD32"  # Green for possible moves
+            self.HOVER_COLOR = "#5E81AC"      # Dark blue
+            
+            # Add style constants
+            self.BUTTON_STYLE = """
+                QPushButton {
+                    background-color: #4C566A;
+                    color: white;
+                    border: none;
+                    border-radius: 3px;
+                    padding: 5px 10px;
+                    font-size: 11px;
+                    font-weight: bold;
+                    min-width: 80px;
+                    margin: 2px;
+                }
+                QPushButton:hover {
+                    background-color: #5E81AC;
+                }
+                QPushButton:pressed {
+                    background-color: #81A1C1;
+                }
+            """
+            
+            self.LABEL_STYLE = """
+                QLabel {
+                    color: #2C3E50;
+                    font-size: 11px;
+                    font-weight: bold;
+                    padding: 4px 8px;
+                    background-color: #ECF0F1;
+                    border-radius: 3px;
+                    min-width: 100px;
+                    qproperty-alignment: AlignCenter;
+                }
+            """
+            
+            # Track selected piece and possible moves
+            self.selected_square = None
+            self.possible_moves = set()
+            
+            # Remove pygame-related code
+            self.SQUARE_SIZE = 80
+            
+            # Define the base path for piece images
+            self.pieces_path = os.path.join(os.path.dirname(__file__), "..", "assets", "pieces")
+            
+            # Load piece images
+            self.pieces = {}
+            for color in ['white', 'black']:
+                for piece in ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king']:
+                    image_path = os.path.join(self.pieces_path, f"{color}_{piece}.png")
+                    try:
+                        # No need for pygame image loading
+                        self.pieces[f"{color}_{piece}"] = image_path
+                    except Exception as e:
+                        print(f"Error loading image {image_path}: {e}")
+
+            self.setWindowTitle("Chess Game")
+            self.setFixedSize(QSize(1000, 600)) 
+            
+            # Initialize Stockfish with multiple possible paths
+            stockfish_paths = [
+                "C:/Users/Admin/Downloads/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
+                "C:/Users/jeffr/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
+                "C:/Users/JChee/Documents/Python_Practice/Python_Practice/Custom Projects/Chess/stockfish/stockfish-windows-x86-64-avx2.exe",  # Windows
+                "/usr/local/bin/stockfish",  # macOS Homebrew
+                "/usr/bin/stockfish",        # Linux
+                "stockfish"  # System PATH
+            ]
+
             try:
-                print(f"Trying Stockfish path: {path}")
-                self.engine = Stockfish(path=path)
-                # Test if engine is working
-                self.engine.get_board_visual()
-                print(f"Successfully initialized Stockfish at: {path}")
-                break
-            except Exception as e:
-                print(f"Failed to initialize Stockfish at {path}: {e}")
-                continue
+                if hasattr(self, 'engine') and self.engine:
+                    self.engine.quit()
+            except:
+                pass
+            
+            self.engine = None
+            for path in stockfish_paths:
+                try:
+                    self.engine = Stockfish(path=path)
+                    # Test if engine is working
+                    self.engine.get_board_visual()
+                    print(f"✅ SUCCESSFULLY Initialized Stockfish at: {path} ✅")
+                    break
+                except:
+                    continue
 
-        if self.engine is None:
-            QMessageBox.critical(
-                self, 
-                "Stockfish Not Found",
-                "Could not find Stockfish chess engine. Please:\n\n"
-                "1. Install Stockfish:\n"
-                "   - Windows: Download from https://stockfishchess.org/\n"
-                "   - macOS: brew install stockfish\n"
-                "   - Linux: sudo apt install stockfish\n\n"
-                "2. Ensure it's in one of these locations:\n"
-                f"{chr(10).join(stockfish_paths)}"
-            )
-            sys.exit(1)
+            if self.engine is None:
+                QMessageBox.critical(
+                    self, 
+                    "Stockfish Not Found",
+                    "Could not find Stockfish chess engine. Please:\n\n"
+                    "1. Install Stockfish:\n"
+                    "   - Windows: Download from https://stockfishchess.org/\n"
+                    "   - macOS: brew install stockfish\n"
+                    "   - Linux: sudo apt install stockfish\n\n"
+                    "2. Ensure it's in one of these locations:\n"
+                    f"{chr(10).join(stockfish_paths)}"
+                )
+                sys.exit(1)
 
-        # Add status label for turn indicator with dynamic styling
-        self.status_label = QLabel("Current Turn: White")
-        self.status_label.setMinimumWidth(120)
-        self.status_label.setMaximumWidth(120)
-        
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_timer)
-        self.time = QTime(0, 0)
-        self.timer_label = QLabel("Game Time: 00:00")
-        self.timer_label.setMinimumWidth(100)
-        self.timer_label.setMaximumWidth(100)
-        
-        self.move_stack = []  # Stack to keep track of moves for undo functionality
+            # Add status label for turn indicator with dynamic styling
+            self.status_label = QLabel("Current Turn: White")
+            self.status_label.setMinimumWidth(120)
+            self.status_label.setMaximumWidth(120)
+            
+            self.timer = QTimer(self)
+            self.timer.timeout.connect(self.update_timer)
+            self.time = QTime(0, 0)
+            self.timer_label = QLabel("Game Time: 00:00")
+            self.timer_label.setMinimumWidth(100)
+            self.timer_label.setMaximumWidth(100)
+            
+            self.move_stack = []  # Stack to keep track of moves for undo functionality
 
-        # Remove AI difficulty feature
-        self.move_history = []
-        self.current_move_number = 1
-        self.captured_pieces = {'white': Counter(), 'black': Counter()}
-        self.white_captured = None
-        self.black_captured = None
-        
-        # Initialize captured pieces tracking with all possible pieces
-        piece_symbols = ['♟', '♞', '♝', '♜', '♛', '♚']
-        self.captured_pieces = {
-            'white': {symbol: 0 for symbol in piece_symbols},
-            'black': {symbol: 0 for symbol in piece_symbols}
-        }
-        
-        # Add piece symbols mapping
-        self.piece_symbols = {
-            'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',  # White pieces
-            'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'   # Black pieces
-        }
-        
-        # Add piece size constants based on classical Staunton Design proportions
-        base_size = 35  # Base size for pawn
-        self.PIECE_SIZES = {
-            'pawn': base_size,
-            'rook': int(base_size * 1.05),
-            'knight': int(base_size * 1.3),
-            'bishop': int(base_size * 1.55),
-            'queen': int(base_size * 1.8),
-            'king': int(base_size * 2.05)
-        }
-        
-        self.initUI()
-        self.create_toolbar()
-        self.create_side_panel()
-        self.update_turn_indicator()  # Initial update
-        self.start_timer()  # Start the timer
+            # Remove AI difficulty feature
+            self.move_history = []
+            self.current_move_number = 1
+            self.captured_pieces = {'white': Counter(), 'black': Counter()}
+            self.white_captured = None
+            self.black_captured = None
+            
+            # Initialize captured pieces tracking with all possible pieces
+            piece_symbols = ['♟', '♞', '♝', '♜', '♛', '♚']
+            self.captured_pieces = {
+                'white': {symbol: 0 for symbol in piece_symbols},
+                'black': {symbol: 0 for symbol in piece_symbols}
+            }
+            
+            # Add piece symbols mapping
+            self.piece_symbols = {
+                'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',  # White pieces
+                'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'   # Black pieces
+            }
+            
+            # Add piece size constants based on classical Staunton Design proportions
+            base_size = 35  # Base size for pawn
+            self.PIECE_SIZES = {
+                'pawn': base_size,
+                'rook': int(base_size * 1.05),
+                'knight': int(base_size * 1.3),
+                'bishop': int(base_size * 1.55),
+                'queen': int(base_size * 1.8),
+                'king': int(base_size * 2.05)
+            }
+            
+            self.initUI()
+            self.create_toolbar()
+            self.create_side_panel()
+            self.update_turn_indicator()  # Initial update
+            self.start_timer()  # Start the timer
+
+            logger.info('✅ Chess GUI initialized successfully')
+
+        except Exception as e:
+            logger.error(f'❌ Error initializing ChessGUI: {e}', exc_info=True)
+            QMessageBox.critical(self, "Initialization Error", 
+                               f"Failed to start the game: {str(e)}\n\nPlease check the logs for details.")
+            raise
 
     def start_timer(self):
         self.timer.start(1000)  # Update every second
@@ -522,41 +551,61 @@ class ChessGUI(QMainWindow):
             self.update_board()
 
     def make_ai_move(self):
-        """Handle AI move with proper error checking"""
+        """Handle AI move with enhanced error handling"""
         try:
+            if not self.engine:
+                raise StockfishError("❌ Stockfish engine not initialized")
+                
+            logger.debug("🤖 Starting AI move calculation")
             ai_move = self.get_ai_move()
-            if ai_move and ai_move in self.board.legal_moves:
-                # Get capture info before making move
-                captured = self.board.piece_at(ai_move.to_square)
-                
-                # Make the move
-                self.board.push(ai_move)
-                
-                # Update move history
-                self.update_move_history(ai_move)
-                
-                # Handle capture if any
-                if captured:
-                    self.update_captured_pieces(captured)
-                
-                self.move_stack.append(ai_move)
-                self.update_board()
-                self.update_turn_indicator()
-                self.check_game_state()
+            
+            if not ai_move:
+                raise GameStateError("⚠️ AI failed to produce a valid move")
+            
+            if ai_move not in self.board.legal_moves:
+                raise GameStateError(f"❌ AI produced illegal move: {ai_move}")
+            
+            self._execute_move(ai_move)
+            logger.info(f"✅ AI made move: {ai_move}")
+            
+        except (StockfishError, GameStateError) as e:
+            logger.error(str(e))
+            self.show_error_dialog("AI Error", str(e))
         except Exception as e:
-            print(f"Error making AI move: {e}")
+            logger.error(f"❌ Unexpected error in AI move: {e}", exc_info=True)
+            self.show_error_dialog("AI Error", f"Unexpected error: {str(e)}")
 
-    def ai_move(self):
-        move = self.get_ai_move()
-        if move:
-            # Update history before making the move
-            self.update_move_history(move)
+    def _execute_move(self, move):
+        """Execute a move with proper validation and error handling"""
+        try:
+            if not self.board.is_legal(move):
+                raise GameStateError(f"❌ Illegal move attempted: {move}")
+            
+            # Get capture info before making move
+            captured = self.board.piece_at(move.to_square)
+            
+            # Make the move
             self.board.push(move)
             self.move_stack.append(move)
+            
+            # Update move history
+            self.update_move_history(move)
+            
+            # Handle capture if any
+            if captured:
+                logger.debug(f"👊 Piece captured: {captured}")
+                self.update_captured_pieces(captured)
+            
             self.update_board()
             self.update_turn_indicator()
-            if self.board.is_game_over():
-                self.show_game_over_message()
+            self.check_game_state()
+            
+        except GameStateError as e:
+            logger.error(str(e))
+            raise
+        except Exception as e:
+            logger.error(f"❌ Error executing move: {e}", exc_info=True)
+            raise
 
     def get_ai_move(self):
         """Get the best move from Stockfish"""
@@ -771,129 +820,170 @@ class ChessGUI(QMainWindow):
             new_window = ChessGUI(start_menu.game_mode)
             new_window.show()
 
+    def show_error_dialog(self, title, message):
+        """Show error dialog with enhanced styling"""
+        error_box = QMessageBox(self)
+        error_box.setIcon(QMessageBox.Icon.Critical)
+        error_box.setWindowTitle(title)
+        error_box.setText(message)
+        error_box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        error_box.setStyleSheet("""
+            QMessageBox {
+                background-color: #f8f9fa;
+            }
+            QPushButton {
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                padding: 5px 15px;
+                border-radius: 3px;
+            }
+            QPushButton:hover {
+                background-color: #c82333;
+            }
+        """)
+        return error_box.exec()
+
     def save_game(self):
-        """Save the current game state and move history to a file"""
+        """Save the current game state with enhanced error handling"""
         try:
-            # Get the file path using QFileDialog
-            file_path, _ = QFileDialog.getSaveFileName(
-                self,
-                "Save Game",
-                "",  # Default directory
-                "Chess Files (*.chess)",  # File type filter
-                options=QFileDialog.Option.DontUseNativeDialog
-            )
+            logger.info("💾 Initiating game save")
             
-            if file_path:
-                # Ensure the file has .chess extension
-                if not file_path.endswith('.chess'):
-                    file_path += '.chess'
-                
-                # Create game data dictionary
-                game_data = {
-                    'fen': self.board.fen(),
-                    'moves': [move.uci() for move in self.board.move_stack],
-                    'game_mode': self.game_mode,
-                    'move_history': self.move_history,
-                    'current_move_number': self.current_move_number,
-                    'time': self.time.toString('mm:ss'),
-                    'captured_pieces': {
-                        'white': {str(k): v for k, v in self.captured_pieces['white'].items()},
-                        'black': {str(k): v for k, v in self.captured_pieces['black'].items()}
-                    }
-                }
-                
-                # Save to file using json
-                with open(file_path, 'w', encoding='utf-8') as file:
-                    json.dump(game_data, file, ensure_ascii=False, indent=4)
-                
-                # Show success message
-                QMessageBox.information(
-                    self,
-                    "Success",
-                    "Game saved successfully!",
-                    QMessageBox.StandardButton.Ok
-                )
-                
+            # Validate game state before saving
+            if not self.board or not hasattr(self, 'game_mode'):
+                raise GameStateError("❌ Invalid game state for saving")
+            
+            file_path = self._get_save_file_path()
+            if not file_path:
+                logger.info("ℹ️ Game save cancelled by user")
+                return
+            
+            game_data = self._prepare_game_data()
+            self._write_game_data(file_path, game_data)
+            
+            logger.info(f"✅ Game saved successfully to {file_path}")
+            QMessageBox.information(self, "Success", "Game saved successfully!")
+            
+        except GameStateError as e:
+            logger.error(str(e))
+            self.show_error_dialog("Save Error", str(e))
         except Exception as e:
-            # Show error message
-            QMessageBox.critical(
-                self,
-                "Error",
-                f"Failed to save game: {str(e)}",
-                QMessageBox.StandardButton.Ok
-            )
-            logger.error(f"Error saving game: {e}")
+            error_msg = f"❌ Failed to save game: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            self.show_error_dialog("Save Error", error_msg)
+
+    def _prepare_game_data(self):
+        """Prepare game data for saving with validation"""
+        try:
+            return {
+                'fen': self.board.fen(),
+                'moves': [move.uci() for move in self.board.move_stack],
+                'game_mode': self.game_mode,
+                'move_history': self.move_history,
+                'current_move_number': self.current_move_number,
+                'time': self.time.toString('mm:ss'),
+                'captured_pieces': {
+                    'white': {str(k): v for k, v in self.captured_pieces['white'].items()},
+                    'black': {str(k): v for k, v in self.captured_pieces['black'].items()}
+                }
+            }
+        except Exception as e:
+            logger.error(f"❌ Error preparing game data: {e}", exc_info=True)
+            raise
+
+    def _write_game_data(self, file_path, game_data):
+        """Write game data to file with proper error handling"""
+        try:
+            with open(file_path, 'w', encoding='utf-8') as file:
+                json.dump(game_data, file, ensure_ascii=False, indent=4)
+        except IOError as e:
+            logger.error(f"❌ IO Error while saving game: {e}", exc_info=True)
+            raise
+        except json.JSONEncodeError as e:
+            logger.error(f"❌ JSON encoding error: {e}", exc_info=True)
+            raise
 
     def load_game(self):
-        """Load a game state from a file"""
+        """Load a game state with improved error handling"""
         try:
-            # Get the file path using QFileDialog
+            logger.info("📂 Initiating game load")
             file_path, _ = QFileDialog.getOpenFileName(
                 self,
                 "Load Game",
-                "",  # Default directory
-                "Chess Files (*.chess)",  # File type filter
+                "",
+                "Chess Files (*.chess)",
                 options=QFileDialog.Option.DontUseNativeDialog
             )
             
-            if file_path:
-                # Read the file
+            if not file_path:
+                logger.info("ℹ️ Game load cancelled by user")
+                return
+            
+            try:
                 with open(file_path, 'r', encoding='utf-8') as file:
                     game_data = json.load(file)
-                
-                # Ask if user wants to replay or continue
-                replay = QMessageBox.question(
-                    self,
-                    "Load Game",
-                    "Would you like to replay this game?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-                )
-                
-                if replay == QMessageBox.StandardButton.Yes:
-                    # Create replay dialog with the moves
-                    moves = [chess.Move.from_uci(move) for move in game_data['moves']]
-                    replay_dialog = ReplayDialog(moves, self)
-                    replay_dialog.exec()
-                else:
-                    # Load the final position
-                    self.board.set_fen(game_data['fen'])
-                    self.game_mode = game_data.get('game_mode', 'Player')
-                    self.move_history = game_data.get('move_history', [])
-                    self.current_move_number = game_data.get('current_move_number', 1)
-                    
-                    # Load captured pieces
-                    if 'captured_pieces' in game_data:
-                        self.captured_pieces = {
-                            'white': {eval(k): v for k, v in game_data['captured_pieces']['white'].items()},
-                            'black': {eval(k): v for k, v in game_data['captured_pieces']['black'].items()}
-                        }
-                    
-                    # Reset game state
-                    self.selected_square = None
-                    self.possible_moves.clear()
-                    self.move_list.clear()
-                    
-                    # Update display
-                    self.update_board()
-                    self.update_turn_indicator()
-                    
-                    # Show success message
-                    QMessageBox.information(
-                        self,
-                        "Success",
-                        "Game loaded successfully!",
-                        QMessageBox.StandardButton.Ok
-                    )
-                    
+                logger.debug(f"Successfully read game data from {file_path}")
+            except json.JSONDecodeError as e:
+                logger.error(f"Invalid game file format: {e}", exc_info=True)
+                raise ValueError("Invalid game file format")
+            except IOError as e:
+                logger.error(f"Error reading game file: {e}", exc_info=True)
+                raise
+            
+            # Validate required game data
+            required_fields = ['fen', 'moves', 'game_mode']
+            missing_fields = [field for field in required_fields if field not in game_data]
+            if missing_fields:
+                error_msg = f"Missing required fields in game file: {', '.join(missing_fields)}"
+                logger.error(error_msg)
+                raise ValueError(error_msg)
+            
+            # Process the loaded game
+            self.process_loaded_game(game_data)
+            logger.info("✅ Game loaded successfully")
+            
         except Exception as e:
-            # Show error message
-            QMessageBox.critical(
-                self,
-                "Error",
-                f"Failed to load game: {str(e)}",
-                QMessageBox.StandardButton.Ok
-            )
-            logger.error(f"Error loading game: {e}")
+            error_msg = f"❌ Failed to load game: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            self.show_error_dialog("Load Error", error_msg)
+
+    def process_loaded_game(self, game_data):
+        """Process loaded game data with validation"""
+        try:
+            # Validate FEN string
+            if not chess.Board.is_valid_fen(game_data['fen']):
+                raise ValueError("Invalid FEN string in game file")
+            
+            self.board.set_fen(game_data['fen'])
+            self.game_mode = game_data.get('game_mode', 'Player')
+            self.move_history = game_data.get('move_history', [])
+            self.current_move_number = game_data.get('current_move_number', 1)
+            
+            # Load captured pieces with validation
+            if 'captured_pieces' in game_data:
+                try:
+                    self.captured_pieces = {
+                        'white': {eval(k): v for k, v in game_data['captured_pieces']['white'].items()},
+                        'black': {eval(k): v for k, v in game_data['captured_pieces']['black'].items()}
+                    }
+                except (SyntaxError, NameError) as e:
+                    logger.warning(f"Error loading captured pieces: {e}")
+                    self.captured_pieces = {'white': Counter(), 'black': Counter()}
+            
+            # Reset game state
+            self.selected_square = None
+            self.possible_moves.clear()
+            self.move_list.clear()
+            
+            # Update display
+            self.update_board()
+            self.update_turn_indicator()
+            
+            QMessageBox.information(self, "Success", "Game loaded successfully!")
+            
+        except Exception as e:
+            logger.error(f"Error processing loaded game data: {e}", exc_info=True)
+            raise
 
     def update_turn_indicator(self):
         """Update the status label to show current turn with dynamic styling"""
@@ -925,13 +1015,18 @@ class ChessGUI(QMainWindow):
             """)
 
     def __del__(self):
-        """Clean up Stockfish engine properly"""
+        """Clean up resources with improved error handling"""
         try:
             if hasattr(self, 'engine') and self.engine:
-                self.engine.quit()
+                logger.info("🧹 Cleaning up Stockfish engine")
+                try:
+                    if hasattr(self.engine, '_stockfish'):
+                        self.engine._stockfish.terminate()
+                    logger.info("✅ Stockfish engine cleaned up successfully")
+                except Exception as e:
+                    logger.error(f"❌ Error terminating Stockfish: {e}", exc_info=True)
         except Exception as e:
-            print(f"Error cleaning up Stockfish: {e}")
-        super().__del__()  # Call parent's __del__ if it exists
+            logger.error(f"❌ Error in cleanup: {e}", exc_info=True)
 
 
 
