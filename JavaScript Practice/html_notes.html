@@ -1,0 +1,208 @@
+
+# Sect. 3: HTML – The Essentials
+
+### 📎 Resources  
+- [Zip](#)  
+- [PDF](#)  
+- [Slides - Link](#)  
+- [MDN Developer Network](https://developer.mozilla.org/en-US/docs/Web/HTML)
+
+---
+
+### 🔤 Paragraph Elements  
+```html
+<p>Insert Text Here</p>
+```
+
+### 🔠 Heading Elements  
+```html
+<h1> to <h6>
+```
+
+### 🛠️ Chrome Inspector  
+Use DevTools to inspect and debug HTML structure.
+
+### ⚙️ HTML Boilerplate  
+Typing `!` in many editors like VS Code gives the basic HTML5 skeleton.
+
+---
+
+### 📋 List Elements  
+```html
+<ul>
+  <li>Unordered Item</li>
+</ul>
+
+<ol>
+  <li>Ordered Item</li>
+</ol>
+```
+
+---
+
+### 🔗 Anchor Tags  
+```html
+<a href="https://example.com">Visit Example</a>
+<a href="https://example.com" target="_blank">Open in New Tab</a>
+```
+
+---
+
+### 🖼️ Images  
+```html
+<img src="image-url.jpg" id="logo" />
+```
+
+---
+
+### 💬 Comments  
+```html
+<!-- HTML Comment -->
+```
+
+# Sect. 4: HTML – Next Steps & Semantics
+
+### 📎 Resources  
+- [Zip](#)  
+- [PDF](#)  
+- [Slides - Link](#)  
+
+---
+
+### 🧱 Block vs Inline Elements  
+- **Block Elements** (e.g. `<div>`)  
+  Always start on a new line, take up the full width.
+
+- **Inline Elements** (e.g. `<span>`)  
+  Stay on the same line, only take up as much space as needed.
+
+---
+
+### 📖 HTML References  
+- [HTML elements reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element)  
+- [HTML entity code reference](https://developer.mozilla.org/en-US/docs/Glossary/Entity)
+
+---
+
+### 🔎 Semantic Markup  
+Example: Medium.com vs Stripe.com  
+Semantic HTML uses tags that convey meaning:
+
+#### 📌 Why it matters:  
+- Improves **accessibility** (e.g., screen readers)
+- Enhances **SEO**
+- Makes code **more readable**
+- Supports better **styling and scripting**
+
+#### 🧩 Common Elements  
+`<article>`, `<section>`, `<nav>`, `<header>`, `<footer>`, `<main>`, `<aside>`
+
+---
+
+### 🔊 Screen Reader & Accessibility  
+Best practices include:
+- Proper HTML structure (e.g. headings, lists, tables)
+- ARIA roles and labels
+- Alt text for images
+- Descriptive form labels
+
+---
+
+### ⚡ Emmet  
+Rapid HTML/CSS generation with shortcuts like:
+```emmet
+ul>li.item$*3
+```
+
+# Sect. 5: HTML – Forms & Tables
+
+### 📎 Resources  
+- [Zip](#)  
+- [PDF](#)  
+- [Slides - Link](#)  
+
+---
+
+### 🧾 HTML Tables  
+```html
+<tr>  <!-- Table Row -->
+<td>  <!-- Table Data Cell -->
+<th>  <!-- Table Header Cell -->
+```
+
+### 📐 Table Sections  
+```html
+<thead>  <!-- Table Header -->
+<tbody>  <!-- Table Body -->
+<tfoot>  <!-- Table Footer -->
+```
+
+---
+
+### 🔢 Colspan & Rowspan  
+```html
+<td colspan="2">Spans Two Columns</td>
+<td rowspan="3">Spans Three Rows</td>
+```
+
+---
+
+### 📥 The `<form>` Element  
+Wraps input fields and defines the submission method.
+
+---
+
+### ✏️ Common Input Types  
+```html
+<input type="text" />
+<input type="email" />
+<input type="password" />
+```
+
+---
+
+### 🏷️ The All-Important `<label>`  
+```html
+<label for="email">Email</label>
+<input id="email" type="email" />
+```
+
+---
+
+### 🔘 Buttons & Submission  
+```html
+<button type="submit">Submit</button>
+```
+
+---
+
+### 📛 The `name` Attribute  
+Required for input data to be sent to the backend:
+```html
+<input name="username" />
+```
+
+---
+
+### ✅ Radio Buttons, Checkboxes, & Selects  
+```html
+<input type="radio" name="option" />
+<input type="checkbox" />
+<select><option>Item</option></select>
+```
+
+---
+
+### 🎚️ Range & Textarea  
+```html
+<input type="range" min="0" max="100" />
+<textarea rows="4" cols="50"></textarea>
+```
+
+---
+
+### 🛡️ HTML5 Validations  
+```html
+<input type="email" required />
+<input type="text" minlength="3" maxlength="15" />
+```
