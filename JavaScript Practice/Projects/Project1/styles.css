@@ -1,7 +1,9 @@
 /* 
 TODO 1: Basic Reset
-- Reset margins and padding
-- Set box-sizing
+Step-by-step:
+1. Use the universal selector (*) to target all elements
+2. Set margin and padding to 0 to remove browser defaults
+3. Set box-sizing to border-box for better size calculations
 */
 * {
   margin: 0;
@@ -11,137 +13,216 @@ TODO 1: Basic Reset
 
 /* 
 TODO 2: Body Styles
-- Set minimum height
-- Center the calculator on the page
-- Choose a background color
-- Set a default font
+Step-by-step:
+1. Set min-height to 100vh to fill the entire viewport
+2. Use flexbox (display: flex) for centering:
+   - justify-content: center (horizontal centering)
+   - align-items: center (vertical centering)
+3. Create a diagonal gradient background:
+   - Start color: #4a90e2 (blue)
+   - End color: #87ceeb (light blue)
+4. Set modern font stack for better cross-platform appearance
 */
 body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f0f0f0;
-  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom right, #4a90e2, #87ceeb);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* 
 TODO 3: Calculator Container
-- Set width and padding
-- Add border radius for rounded corners
-- Add a subtle shadow
-- Center on page
+Step-by-step:
+1. Set fixed width to 320px for optimal size
+2. Add 20px padding for internal spacing
+3. Set border-radius to 20px for rounded corners
+4. Use dark background (#1c1c1c) for classic calculator look
+5. Add shadow with:
+   - 0 10px 30px spread
+   - 30% opacity black
 */
-.calculator-container {
+.container {
+  width: 320px;
   padding: 20px;
-  border-radius: 10px;
-  background-color: #fff;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-}
-
-.calculator {
-  width: 300px;
+  border-radius: 20px;
+  background-color: #1c1c1c;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 /* 
 TODO 4: Display Styles
-- Make it full width
-- Add appropriate padding
-- Right-align the text
-- Style the border and background
+Step-by-step:
+1. Create display container:
+   - Full width (100%)
+   - 20px bottom margin
+   - Dark gray background (#3b3b3b)
+   - 10px border radius
+2. Style the input element:
+   - 80px height for visibility
+   - 15px padding
+   - Very dark background (#1e1e1e)
+   - White text color
+   - Right-aligned text
+   - 2.5rem font size
+   - Monospace font for numeric display
+   - Add subtle text glow with text-shadow
 */
 .display {
   width: 100%;
-  height: 60px;
   margin-bottom: 20px;
-  padding: 10px;
-  font-size: 24px;
-  text-align: right;
+  background-color: #3b3b3b;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.display input {
+  width: 100%;
+  height: 80px;
+  padding: 15px;
+  background-color: #1e1e1e;
   border: none;
-  background-color: #f8f9fa;
-  border-radius: 5px;
+  color: #fff;
+  text-align: right;
+  font-size: 2.5rem;
+  font-family: "Courier New", monospace;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
 /* 
 TODO 5: Button Grid
-- Create a grid layout (hint: use grid or flexbox)
-- Set gap between buttons
-- Make it responsive
+Step-by-step:
+1. Use CSS Grid with:
+   - display: grid
+   - 4 equal columns (repeat(4, 1fr))
+   - 12px gap between buttons
 */
 .buttons-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 
 /* 
 TODO 6: Button Styles
-- Style the basic button appearance
-- Add padding and font size
-- Style different button types (numbers, operators, equals, clear)
-- Add hover and active states
+Step-by-step:
+1. Base button styles (.button):
+   - 20px padding
+   - 1.5rem font size
+   - No border
+   - 10px border radius
+   - Bold font weight
+   - Smooth 0.2s transition
+
+2. Number buttons:
+   - Dark gradient (333333 to 2b2b2b)
+   - White text
+   - 3D shadow effect with light/dark edges
+
+3. Operator buttons:
+   - Orange gradient (ff9500 to ff8000)
+   - White text
+   - Larger 1.8rem font size
+
+4. Equals button:
+   - Green gradient (4cd964 to 32b84d)
+   - Span 2 columns
+   - White text
+
+5. Clear button:
+   - Red gradient (ff3b30 to dc1c13)
+   - White text
+
+6. Add press animation:
+   - Scale down to 95%
+   - Inner shadow effect
 */
-.btn {
-  padding: 15px;
-  font-size: 18px;
+.button {
+  padding: 20px;
+  font-size: 1.5rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  font-weight: bold;
+  transition: all 0.2s ease;
 }
 
-.btn:active {
-  transform: scale(0.95);
-}
-
-/* Button Colors */
+/* Number buttons - subtle gray */
 .number {
-  background-color: #e9ecef;
-  color: #212529;
+  background: linear-gradient(145deg, #333333, #2b2b2b);
+  color: #ffffff;
+  box-shadow: 3px 3px 6px #1a1a1a, -3px -3px 6px #464646;
 }
 
+/* Operator buttons - orange accent */
 .operator {
-  background-color: #fd7e14;
+  background: linear-gradient(145deg, #ff9500, #ff8000);
   color: white;
+  font-size: 1.8rem;
 }
 
+/* Equals button - make it stand out */
 .equals {
-  background-color: #28a745;
+  background: linear-gradient(145deg, #4cd964, #32b84d);
   color: white;
   grid-column: span 2;
 }
 
+/* Clear button - warning red */
 .clear {
-  background-color: #dc3545;
+  background: linear-gradient(145deg, #ff3b30, #dc1c13);
   color: white;
 }
 
-/* Hover Effects */
-.btn:hover {
-  filter: brightness(90%);
+/* Button press effects */
+.button:active {
+  transform: scale(0.95);
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 /* 
 TODO 7: Responsive Design
-- Add media queries for different screen sizes
-- Adjust button sizes and padding for mobile
-- Ensure calculator fits on small screens
+Step-by-step:
+1. Create media query for screens under 400px
+2. Adjust container:
+   - 95% width
+   - 320px max-width
+   - Reduce padding to 15px
+3. Modify buttons:
+   - Reduce padding to 15px
+   - Smaller 1.3rem font size
+4. Adjust display:
+   - Reduce height to 60px
+   - Smaller 2rem font size
 */
 @media (max-width: 400px) {
-  .calculator {
-    width: 100%;
-    max-width: 300px;
+  .container {
+    width: 95%;
+    max-width: 320px;
+    padding: 15px;
   }
 
-  .btn {
-    padding: 10px;
-    font-size: 16px;
+  .button {
+    padding: 15px;
+    font-size: 1.3rem;
+  }
+
+  .display input {
+    height: 60px;
+    font-size: 2rem;
   }
 }
 
 /*
-BONUS:
-- Add transitions for smooth interactions
-- Create a dark mode theme
-- Add button press animations
+BONUS Challenges:
+1. Sound Effects: Add click sound using JavaScript's Audio API
+2. Solar Panel: Create a strip above display with CSS gradients
+3. Tilt Effect: Use CSS transform on container hover
+4. Theme Toggle: Add CSS variables for color schemes
+*/
+
+/* 
+To deploy the project you will need to navigate to the project folder and run the following command:
+`python -m http.server 8000`
 */
