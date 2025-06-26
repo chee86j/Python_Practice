@@ -1,0 +1,91 @@
+/* Base styles and CSS reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 
+TODO 1: Add CSS Variables
+- Define colors
+- Define breakpoints
+- Define transitions
+- Define spacing units
+*/
+
+/* 
+TODO 2: Style the navbar container
+- Fixed position
+- Full width
+- Background color
+- Box shadow
+- Z-index
+*/
+
+/* 
+TODO 3: Style the brand/logo
+- Appropriate font size
+- Padding
+- Color
+*/
+
+/* 
+TODO 4: Style the hamburger menu button
+- Hidden by default on desktop
+- Appropriate size and padding
+- Cursor pointer
+- No border or background
+*/
+
+/* 
+TODO 5: Style the navigation links container
+- Use Flexbox
+- Spacing between items
+- Full height
+*/
+
+/* 
+TODO 6: Style individual nav items
+- Padding
+- Color
+- No text decoration
+- Hover effects
+*/
+
+/* 
+TODO 7: Style dropdown menu
+- Position absolute
+- Hidden by default
+- Background color
+- Box shadow
+- Transition for smooth show/hide
+*/
+
+/* 
+TODO 8: Add mobile styles (max-width: 768px)
+- Show hamburger menu
+- Hide nav links by default
+- Full width menu when active
+- Vertical layout for links
+*/
+
+/* 
+TODO 9: Add transition animations
+- Smooth menu toggle
+- Dropdown animations
+- Hover effects
+*/
+
+/* 
+BONUS TODO:
+- Add styles for search form
+- Style mega menu
+- Add dark/light theme variables
+- Create animated hamburger icon
+*/
+
+/* Default styles to get started */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+} 
