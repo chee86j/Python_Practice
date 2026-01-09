@@ -38,6 +38,10 @@ Topics Covered:
         a. Mutating object, but it isn't being used as state
         b. Mutating array, but it isn't being used as state
         c. Use ...spread operator
+        d. Immutability tidbit: React state updates should return a NEW array/object
+        (a copy) rather than mutate the existing one. If you change the same
+        reference, React can miss the update and skip a re-render. Use spread,
+        slice, filter, or map to create a new array.
 
 ---
 
@@ -140,3 +144,57 @@ Topics Covered:
         }
 
         Note the filtering Function (FKT) Filter Keeps True - Element is kept in a new array
+
+=====Now ask yourself: Should I input something in my child component to only rerender and update state when the prop has changed??=====
+
+        Practical rule of thumb: Use React.memo when the child is expensive to render or
+        renders a lot in a list. First make props stable (callbacks/objects), otherwise
+        memo won't help much. If you're unsure, use the React Profiler to confirm you're
+        optimizing the right thing.
+
+        1.  Rerender: React.memo (functional components)
+            By default, a child rerenders whenever its parent rerenders. If you want the child to rerender only when its props change, wrap it:
+
+                const Child = (props) => { /_ ... _/ };
+
+                export default React.memo(Child);
+
+        React.memo does a shallow prop compare. If the prop reference changes (new object/array/function), it counts as “changed”.
+
+        -----Common gotcha: unstable props-----
+
+        If you pass inline objects/functions, the reference changes every render:
+
+            <Child onClick={() => doThing()} options={{ theme: "dark" }} />
+
+        -----Fix by stabilizing props:-----
+
+            const onClick = useCallback(() => doThing(), [doThing]);
+            const options = useMemo(() => ({ theme: "dark" }), []);
+
+            <Child onClick={onClick} options={options} />
+
+        2.  Rerender control (class components)
+            If you’re in classes:
+            a. PureComponent (shallow compare) or
+            b. shouldComponentUpdate
+
+        3.  “Update state only when prop changes”
+            If the child has local state derived from a prop, use an effect that runs only when that prop changes:
+
+                function Child({ value }) {
+                const [localValue, setLocalValue] = useState(value);
+
+                useEffect(() => {
+                setLocalValue(value);
+                }, [value]);
+
+                // ...
+
+            }
+
+        But if you don’t truly need local state, prefer deriving directly (less bugs, fewer renders):
+
+            function Child({ value }) {
+            const computed = value \* 2; // derive, no state needed
+            }
