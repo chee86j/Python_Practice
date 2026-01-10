@@ -1,58 +1,69 @@
-This is a React Starter Project for use in Stephen Grider's courses on Udemy.
-"Modern React with Redux"
+# React Starter Project
+
+This is a React Starter Project for use in Stephen Grider's courses on Udemy.  
+"Modern React with Redux"  
 -"Section 6: How to Handle Forms"
 
-Topics Covered:
+---
 
-1.  State Location
-    A. Parent Component --> Child Component
-    -----books [ { id: number, title: string } ]-----
-    We have to determine how the state is updated? Rerender the component it is defined in + all that component's children.
-    Find all the components that need to use this state
-    Define the state in the lower level common parent
-    -- Parent Component: App.jsx
-    -- Child Component: BookCreate.jsx
-    -- Child Component: BookShow.jsx
-    -- Child Component: BookEdit.jsx
+## Topics Covered
 
-    B. Local Storage now for books and in the future, we will use a database
+### 1. State Location
 
-    C. Receiving new Titles
-    ---> i. Create an event handler in the parent component
-    --->ii. Import useState from react
-    -->iii. Add a new state property to the parent component
-    -->iv. In the child component BookCreate.jsx, create a function that updates the state in the parent component
-    then create the handleChange and handleSubmit functions with event.target.value and event.preventDefault()
-    -->v. Pass the event handler as a prop to the child component BookCreate.jsx (handleChange)
-    -->vi. Note that React treats, numbers, strings, booleans, null and undefined differently.
+#### A. Parent Component --> Child Component  
+-----books [ { id: number, title: string } ]-----  
+
+We have to determine how the state is updated? Rerender the component it is defined in + all that component's children.  
+Find all the components that need to use this state  
+Define the state in the lower level common parent  
+
+-- Parent Component: App.jsx  
+-- Child Component: BookCreate.jsx  
+-- Child Component: BookShow.jsx  
+-- Child Component: BookEdit.jsx
+
+#### B. Local Storage now for books and in the future, we will use a database
+
+#### C. Receiving new Titles  
+---> i. Create an event handler in the parent component  
+--->ii. Import useState from react  
+-->iii. Add a new state property to the parent component  
+-->iv. In the child component BookCreate.jsx, create a function that updates the state in the parent component  
+then create the handleChange and handleSubmit functions with event.target.value and event.preventDefault()  
+-->v. Pass the event handler as a prop to the child component BookCreate.jsx (handleChange)  
+-->vi. Note that React treats, numbers, strings, booleans, null and undefined differently.
 
 ---
 
-    D. Don't mutate that state
-    -->i. Don't
-    a. push() (i.e. colors.push("red") )
-    b. Modifying an Element (i.e. colors[0] = "red")
-    c. Modifying a property (i.e. colors.name = "red")
+### D. Don't mutate that state
 
-        -->ii. Instead,
-        a. Mutating object, but it isn't being used as state
-        b. Mutating array, but it isn't being used as state
-        c. Use ...spread operator
-        d. Immutability tidbit: React state updates should return a NEW array/object
-        (a copy) rather than mutate the existing one. If you change the same
-        reference, React can miss the update and skip a re-render. Use spread,
-        slice, filter, or map to create a new array.
+#### -->i. Don't
+
+a. push() (i.e. colors.push("red") )  
+b. Modifying an Element (i.e. colors[0] = "red")  
+c. Modifying a property (i.e. colors.name = "red")
+
+#### -->ii. Instead,
+
+a. Mutating object, but it isn't being used as state  
+b. Mutating array, but it isn't being used as state  
+c. Use ...spread operator  
+d. Immutability tidbit: React state updates should return a NEW array/object  
+(a copy) rather than mutate the existing one. If you change the same  
+reference, React can miss the update and skip a re-render. Use spread,  
+slice, filter, or map to create a new array.
 
 ---
 
-    E. Update Techniques
+### E. Update Techniques
 
-        (+) Element at the START of an array
-        i.e.
-        const addColor = (newColor) => {
-        const updatedColors = [newColor, ...colors];
-        setColors(updatedColors);
-        };
+#### (+) Element at the START of an array
+
+```js
+const addColor = (newColor) => {
+const updatedColors = [newColor, ...colors];
+setColors(updatedColors);
+};
 
         (+) Element to the END of an array
         const [colors, setColors] = useState([]);
