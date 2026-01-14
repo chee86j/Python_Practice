@@ -1,41 +1,41 @@
 # Responsive Navbar Building Exercise
 
-This exercise will guide you through building a modern responsive navigation bar while learning essential web development concepts.
+Build a modern, responsive navigation bar from scratch while practicing core HTML, CSS, and JavaScript skills. By the end, you will have a fully functional navbar that adapts to mobile and desktop layouts, supports dropdown menus, and includes accessible interactions.
 
 ## Getting Started
 
-1. Review the provided files:
+1. Review the provided files and their roles:
 
    - `index.html`: HTML structure exercise
    - `styles.css`: CSS styling exercise
    - `script.js`: JavaScript functionality exercise
 
 2. Each file contains TODOs and comments explaining what needs to be implemented
-3. Follow the instructions in each file sequentially
-4. Test your implementation after completing each TODO
+3. Follow the instructions in each file sequentially so styles and behavior build correctly
+4. Test your implementation after completing each TODO to catch layout or interaction issues early
 
 ## Learning Path
 
 ### HTML (index.html)
 
 - Master semantic HTML navigation structure
-- Learn about ARIA roles and accessibility
-- Practice creating responsive layouts
-- Implement dropdown menus
+- Learn about ARIA roles and accessibility for menus
+- Practice creating responsive layouts with mobile-first markup
+- Implement dropdown menus and hierarchical navigation
 
 ### CSS (styles.css)
 
-- Master CSS Flexbox layout
-- Implement mobile-first responsive design
-- Create smooth transitions and animations
-- Style interactive elements professionally
+- Master CSS Flexbox layout for navigation bars
+- Implement mobile-first responsive design and breakpoints
+- Create smooth transitions and animations for menus
+- Style interactive elements with clear hover and focus states
 
 ### JavaScript (script.js)
 
-- Handle DOM events effectively
-- Manage responsive menu states
-- Implement smooth animations
-- Add advanced interaction features
+- Handle DOM events effectively for toggles and dropdowns
+- Manage responsive menu states across viewport sizes
+- Implement smooth animations without layout glitches
+- Add advanced interaction features like click-outside handling
 
 ## Testing Your Implementation
 
@@ -53,7 +53,7 @@ After completing each section, test your navbar for:
 - Test frequently on different screen sizes
 - Use browser developer tools
 - Check responsive breakpoints
-- Validate accessibility
+- Validate accessibility with keyboard navigation
 - Reference MDN documentation when needed
 
 ## Bonus Challenges
@@ -68,7 +68,7 @@ After completing the basic implementation, try:
 
 ## Need Help?
 
-- Review the concepts in the provided notes
+- Review the concepts in the provided notes and comments
 - Use browser developer tools
 - Test responsive behavior using device emulation
 - Break down complex features into smaller steps
