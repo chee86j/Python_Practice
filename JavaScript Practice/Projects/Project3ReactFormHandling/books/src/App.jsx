@@ -4,7 +4,7 @@ import BookList from "./components/BookList.jsx";
 
 function App() {
   const [books, setBooks] = useState([]);
-
+  
   const deleteBookById = (id) => {
     const updatedBooks = books.filter((book) => {
       return book.id !== id;
@@ -29,9 +29,8 @@ function App() {
 
   return (
     <div className="app">
-      <BookList books={books} onDelete={deleteBookById} />
+      <BookList books={books} onDelete={deleteBookById} onEdit={editBookById} />
       <BookCreate onCreate={createBook} />
-
     </div>
   );
 }
