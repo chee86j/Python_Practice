@@ -23,12 +23,13 @@ function App() {
   };
 
   const createBook = (title) => {
-    const updatedBooks = [...books, { id: 123, title }];
+    const updatedBooks = [...books, { id: Math.round(Math.random() * 9999), title }];
     setBooks(updatedBooks);
   };
 
   return (
     <div className="app">
+      <h1>Reading List</h1>
       <BookList books={books} onDelete={deleteBookById} onEdit={editBookById} />
       <BookCreate onCreate={createBook} />
     </div>
