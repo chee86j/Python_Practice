@@ -1,10 +1,7 @@
 import { useState } from "react";
 
-function BookEdit({ book, onEdit }) {
+function BookEdit({ book, onSubmit }) {
   const [title, setTitle] = useState(book.title);
-  // starting value is the title of the book and alternatively you can use
-  // placeholder value - placeholder="book.title" and leave the value empty
-  // with this const [title, setTitle] = useState("");
   
   const handleChange = (event) => {
     setTitle(event.target.value);
@@ -12,7 +9,7 @@ function BookEdit({ book, onEdit }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    onEdit(book.id, title);
+    onSubmit(book.id, title);
   };
 
   return <form onSubmit={handleSubmit} className="book-edit">
