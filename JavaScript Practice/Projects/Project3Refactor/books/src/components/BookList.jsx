@@ -1,9 +1,8 @@
 import BookShow from "./BookShow.jsx";
-import BooksContext from "../context/books.jsx";
-import { useContext } from "react";
+import useBooksContext from "../hooks/use-books-context.jsx";
 
 function BookList() {
-  const { books } = useContext(BooksContext);
+  const { books } = useBooksContext();
 
   const renderedBooks = books.map((book) => {
     return (
@@ -13,6 +12,7 @@ function BookList() {
 
   return (
     <div className="book-list">
+      {count} <button onClick={incrementCount}>Click</button>
       {renderedBooks}
     </div>
   );
