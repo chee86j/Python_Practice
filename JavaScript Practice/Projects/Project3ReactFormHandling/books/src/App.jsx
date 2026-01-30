@@ -11,6 +11,10 @@ function App() {
     setBooks(response.data);
   };
 
+  // useEffect common patterns:
+  // 1) No deps array -> runs after every render (rare: logging/global tracking)
+  // 2) [] -> runs once on mount (API calls, event listeners)
+  // 3) [a, b] -> runs on mount + when a/b change (validation, syncing, filtered API calls)
   useEffect(() => {
     fetchBooks();
   }, []);
