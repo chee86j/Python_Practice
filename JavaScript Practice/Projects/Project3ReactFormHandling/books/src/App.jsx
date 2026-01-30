@@ -7,7 +7,7 @@ function App() {
   const [books, setBooks] = useState([]);
 
   const fetchBooks = async () => {
-    const response = await axios.get('http://localhost:3001/books');
+    const response = await axios.get("http://localhost:3001/books");
     setBooks(response.data);
   };
 
@@ -22,14 +22,14 @@ function App() {
 
   const editBookById = async (id, newTitle) => {
     await axios.put(`http://localhost:3001/books/${id}`, {
-      title: newTitle
+      title: newTitle,
     });
     fetchBooks();
   };
 
   const createBook = async (title) => {
-    await axios.post('http://localhost:3001/books', {
-      title:title
+    await axios.post("http://localhost:3001/books", {
+      title: title,
     });
     fetchBooks();
   };
