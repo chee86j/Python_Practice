@@ -35,3 +35,12 @@ Focus: React component state, forms, and CRUD flows.
 - Share data across components with `useContext`.
 - Fetch, create, edit, and delete data from a JSON API.
 - Practice component composition and list rendering.
+
+##Project4
+
+This builds a reusable Button component so your team can standardize button styling and behavior across the app.
+The Button accepts boolean style props: primary, secondary, success, warning, danger, plus modifiers like outline and rounded.
+Only one “variant” prop should be true at a time (mutually exclusive). The active prop determines the button’s look.
+Instead of manually concatenating class strings with lots of if statements, the project uses classnames to conditionally apply the correct Tailwind utility classes while keeping a shared base style.
+With PropTypes-style validation enforcing the “one variant only” rule, classnames reliably outputs a single, consistent class list per render.
+Net effect: every SWE uses the same Button API, buttons look consistent everywhere, and adding or changing styles is centralized and predictable.
