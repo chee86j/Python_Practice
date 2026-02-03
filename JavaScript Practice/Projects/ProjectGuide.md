@@ -44,3 +44,17 @@ Only one “variant” prop should be true at a time (mutually exclusive). The a
 Instead of manually concatenating class strings with lots of if statements, the project uses classnames to conditionally apply the correct Tailwind utility classes while keeping a shared base style.
 With PropTypes-style validation enforcing the “one variant only” rule, classnames reliably outputs a single, consistent class list per render.
 Net effect: every SWE uses the same Button API, buttons look consistent everywhere, and adding or changing styles is centralized and predictable.
+
+Note:
+A few patterns show up a lot in real teams. They all aim at the same outcome: one source of truth for design decisions, so engineers don’t “freestyle” styling component by component.
+
+Design-system approaches (most common in teams)
+1) Component library + documented variants
+
+Build (or adopt) a shared component set like Button, Input, Card, etc., and treat it as the only approved way to render those UI elements.
+
+Enforce variants via an API: variant="primary" size="sm" tone="danger".
+
+Put the components in a shared package (monorepo or internal npm package).
+
+Bonus: add a Storybook so everyone sees the same canonical examples.
