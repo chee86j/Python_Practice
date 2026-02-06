@@ -4,12 +4,12 @@ function Accordion({ items }) {
     const [expandedIndex, setExpandedIndex] = useState(0);
 
     // Adding Conditional Rendering
-    const renderedItems = items.map((item) => {
+    const renderedItems = items.map((item, index) => {
         const isExpanded = index === expandedIndex;
     
         return (
         <div key={item.id}>
-            <div>{item.label}</div>
+            <div onClick={() => setExpandedIndex(index)}>{item.label}</div>
             {isExpanded && <div>{item.content}</div>}
         </div>
         );
@@ -25,4 +25,8 @@ Our conditional rendering logic in the above code follows this pattern:
 of the item that was clicked.
 2. If it is, render the content (renderedItems)
 3. If it is not, do not render the content (renderedItems)
+4. With the addition of the onClick event, we can now set the expanded
+index to the index of the item that was clicked. This will cause the
+conditional rendering logic to re-evaluate and render the content for
+the item that was clicked only while the other items are collapsed.
 */
