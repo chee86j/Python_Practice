@@ -1,5 +1,5 @@
-import PropTypes from "prop-types";
-import classNames from "classnames";
+import className from "classnames";
+import { twMerge } from "tailwind-merge";
 
 function Button({
   children,
@@ -10,71 +10,114 @@ function Button({
   danger,
   outline,
   rounded,
+  ...rest
 }) {
-  const baseClasses =
-    "inline-flex items-center justify-center px-6 py-2 border-2 text-lg font-semibold transition-transform duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-400";
+  const classes = twMerge(
+    className(rest.className, "flex items-center px-3 py-1.5 border", {
+      "border-blue-500 bg-blue-500 text-white": primary,
+      "border-gray-900 bg-gray-900 text-white": secondary,
+      "border-green-500 bg-green-500 text-white": success,
+      "border-yellow-400 bg-yellow-400 text-white": warning,
+      "border-red-500 bg-red-500 text-white": danger,
+      "rounded-full": rounded,
+      "bg-white": outline,
+      "text-blue-500": outline && primary,
+      "text-gray-900": outline && secondary,
+      "text-green-500": outline && success,
+      "text-yellow-400": outline && warning,
+      "text-red-500": outline && danger,
+    })
+  );
 
-  const variantStyles = {
-    primary: {
-      fill: "bg-blue-500 border-blue-600 text-white",
-      outline: "bg-white border-blue-600 text-blue-600",
-    },
-    secondary: {
-      fill: "bg-white border-black text-black",
-      outline: "bg-white border-black text-black",
-    },
-    success: {
-      fill: "bg-green-500 border-green-600 text-white",
-      outline: "bg-white border-green-600 text-green-600",
-    },
-    warning: {
-      fill: "bg-yellow-400 border-yellow-500 text-white",
-      outline: "bg-white border-yellow-500 text-white",
-    },
-    danger: {
-      fill: "bg-red-500 border-red-600 text-white",
-      outline: "bg-white border-red-600 text-red-600",
-    },
-  };
-
-  const hasVariant = primary || secondary || success || warning || danger;
-
-  const variantClass = classNames({
-    [variantStyles.primary.fill]: primary && !outline,
-    [variantStyles.primary.outline]: primary && outline,
-    [variantStyles.secondary.fill]: secondary && !outline,
-    [variantStyles.secondary.outline]: secondary && outline,
-    [variantStyles.success.fill]: success && !outline,
-    [variantStyles.success.outline]: success && outline,
-    [variantStyles.warning.fill]: warning && !outline,
-    [variantStyles.warning.outline]: warning && outline,
-    [variantStyles.danger.fill]: danger && !outline,
-    [variantStyles.danger.outline]: danger && outline,
-    "bg-white border-black text-black": !hasVariant,
-  });
-
-  const classes = classNames(baseClasses, variantClass, {
-    "rounded-full": rounded,
-  });
-
-  return <button className={classes}>{children}</button>;
+  return (
+    <button {...rest} className={classes}>
+      {children}
+    </button>
+  );
 }
 
 Button.propTypes = {
-  checkVariationValue: (primary, secondary, success, warning, danger) => {
+  checkVariationValue: ({ primary, secondary, success, warning, danger }) => {
     const count =
       Number(!!primary) +
       Number(!!secondary) +
-      Number(!!success) +
       Number(!!warning) +
+      Number(!!success) +
       Number(!!danger);
 
     if (count > 1) {
       return new Error(
-        "Only one of primary, secondary, success, warning, or danger can be true"
+        "Only one of primary, secondary, success, warning, danger can be true"
       );
     }
   },
 };
 
 export default Button;
+
+
+// This method has been made obsolete with TypeScript. Equivalent to the code above without needing to use PropTypes.
+
+/* 
+import type { FunctionComponent } from "react";
+import className from "classnames";
+ 
+type ExcludeFromTuple<T extends any[], U> = {
+  [K in keyof T]: T[K] extends U ? never : T[K];
+}[number];
+ 
+type Exclusive<T extends PropertyKey[], U = any> = T[number] extends infer E
+  ? E extends string
+    ? Record<E, U> & { [k in ExcludeFromTuple<T, E>]?: never }
+    : never
+  : never & {};
+ 
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  Partial<{
+    outline?: boolean;
+    rounded?: boolean;
+  }> &
+  Exclusive<["primary", "secondary", "success", "warning", "danger"], boolean>;
+ 
+const Button: FunctionComponent<ButtonProps> = ({
+  children,
+  primary,
+  secondary,
+  success,
+  warning,
+  danger,
+  outline,
+  rounded,
+  ...rest
+}) => {
+  const classes = className(
+    rest.className,
+    "flex items-center px-3 py-1.5 border",
+    {
+      "border-blue-500 bg-blue-500": primary,
+      "border-gray-900 bg-gray-900": secondary,
+      "border-green-500 bg-green-500": success,
+      "border-yellow-400 bg-yellow-400": warning,
+      "border-red-500 bg-red-500": danger,
+      "rounded-full": rounded,
+      "text-white":
+        !outline && (primary || secondary || success || warning || danger),
+      "bg-white": outline,
+      "text-blue-500": outline && primary,
+      "text-gray-500": outline && secondary,
+      "text-green-500": outline && success,
+      "text-yellow-500": outline && warning,
+      "text-red-500": outline && danger,
+    }
+  );
+ 
+  return (
+    <button {...rest} className={classes}>
+      {children}
+    </button>
+  );
+};
+ 
+export default Button;
+
+*/
