@@ -3,13 +3,17 @@ import { useState } from 'react';
 function Accordion({ items }) {
     const [expandedIndex, setExpandedIndex] = useState(0);
 
+    const handleClick = (nextIndex) => {
+        setExpandedIndex(nextIndex);
+    };
+
     // Adding Conditional Rendering
     const renderedItems = items.map((item, index) => {
         const isExpanded = index === expandedIndex;
     
         return (
         <div key={item.id}>
-            <div onClick={() => setExpandedIndex(index)}>{item.label}</div>
+            <div onClick={() => handleClick(nextIndex)}>{item.label}</div>
             {isExpanded && <div>{item.content}</div>}
         </div>
         );
@@ -29,4 +33,12 @@ of the item that was clicked.
 index to the index of the item that was clicked. This will cause the
 conditional rendering logic to re-evaluate and render the content for
 the item that was clicked only while the other items are collapsed.
+*/
+
+/*
+With a hybrid shorthand and longhand approach, we can achieve the same
+result with less code. We have to use the longhand approach to set the
+expanded index to the index of the item that was clicked by placing the
+event handler (handleClick function) outside of the map function. Then we have to shorthand
+with the arrow function to set the expanded index to the index of the item that was clicked.
 */
