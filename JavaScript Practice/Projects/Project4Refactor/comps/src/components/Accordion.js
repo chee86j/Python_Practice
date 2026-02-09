@@ -2,10 +2,25 @@ import { useState } from 'react';
 import { GoChevronDown, GoChevronLeft } from 'react-icons/go';
 
 function Accordion({ items }) {
-    const [expandedIndex, setExpandedIndex] = useState(0);
+    const [expandedIndex, setExpandedIndex] = useState(-1);
 
     const handleClick = (nextIndex) => {
-        setExpandedIndex(nextIndex);
+        setExpandedIndex((currentExpandedIndex) => {
+            if (currentExpandedIndex === nextIndex) {
+                return -1;
+            } else {
+                return nextIndex;
+            }
+        });
+
+        // Old way of doing it to avoid quick toggle errors
+        /*
+        if (expandedIndex === nextIndex) {
+            setExpandedIndex(-1);
+        } else {
+            setExpandedIndex(nextIndex);
+        }
+        */
     };
 
     // Adding Conditional Rendering
