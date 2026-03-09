@@ -54,3 +54,23 @@ function Button({ primary, secondary, children }) {
 ## Styling helpers
 
 We pull in the `classnames` library so the `Button` component can build Tailwind-friendly class lists from whichever boolean variation prop is active. `classnames` lets us conditionally append the right utility classes (for colors, outlines, rounded corners, etc.) without string concatenation, which keeps the render code readable and consistent with the PropTypes validation above. Because `PropTypes.checkVariationValue` rejects more than one active variant, `classnames` only ever sees one mutually exclusive styling block, so it can reliably produce the button class list that matches the single prop that is true.
+
+## Current implementation notes (added)
+
+The current `src/Button.js` implementation adds `twMerge` from `tailwind-merge` on top of `classnames`:
+
+- `classnames` builds the conditional class list
+- `twMerge` resolves Tailwind class conflicts when classes overlap
+
+Important behavior details from the current code:
+
+- Only `primary`, `secondary`, `success`, `warning`, and `danger` are mutually exclusive (validated by `checkVariationValue`)
+- `outline` and `rounded` are modifiers and can be combined with one variant
+- Current color mapping in code uses:
+  - `primary`: blue
+  - `secondary`: gray/black (`gray-900`)
+  - `success`: green
+  - `warning`: yellow
+  - `danger`: red
+
+`src/App.js` currently demonstrates icon usage (`react-icons/go`) and event handlers (`onClick`, `onMouseEnter`, `onMouseLeave`) passed through the button component.
