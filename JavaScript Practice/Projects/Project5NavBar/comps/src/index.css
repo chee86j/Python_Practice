@@ -1,0 +1,4 @@
+@import "tailwindcss";
+button > svg {
+  margin-right: 5px;
+}
