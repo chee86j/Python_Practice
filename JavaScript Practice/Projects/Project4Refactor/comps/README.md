@@ -54,3 +54,17 @@ function Button({ primary, secondary, children }) {
 ## Styling helpers
 
 We pull in the `classnames` library so the `Button` component can build Tailwind-friendly class lists from whichever boolean variation prop is active. `classnames` lets us conditionally append the right utility classes (for colors, outlines, rounded corners, etc.) without string concatenation, which keeps the render code readable and consistent with the PropTypes validation above. Because `PropTypes.checkVariationValue` rejects more than one active variant, `classnames` only ever sees one mutually exclusive styling block, so it can reliably produce the button class list that matches the single prop that is true.
+
+
+## useEffect & useRef
+
+This next section will focus on how React components interact with native DOM events, especially for handling clicks outside a component like a dropdown.
+
+- Adding document-wide click handlers
+- Understanding event propagation: capture, target, and bubble phases
+- Checking whether a clicked element is inside or outside a component
+- Using `useEffect` with and without a cleanup function
+- Understanding the `useEffect` dependency array
+- Using `useRef` to reference DOM elements
+- Explaining why `true` is sometimes passed as the third argument to `addEventListener`
+- Issues with Element References i.e. <div classNames="w-48">
