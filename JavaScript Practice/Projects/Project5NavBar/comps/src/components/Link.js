@@ -1,5 +1,7 @@
 import useNavigate from '../hooks/useNavigate';
 
+/* This Link component is the equivalent of React Router's Link component. It uses an anchor tag for semantics 
+and accessibility, but hijacks the click event to perform client-side navigation w/o a full page refresh. */
 function Link({ to, children, className, ...rest }) {
   const navigate = useNavigate();
 

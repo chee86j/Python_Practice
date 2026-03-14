@@ -68,3 +68,6 @@ This next section will focus on how React components interact with native DOM ev
 - Using `useRef` to reference DOM elements
 - Explaining why `true` is sometimes passed as the third argument to `addEventListener`
 - Issues with Element References i.e. <div classNames="w-48">
+
+## Understanding underlying mechanics before you use React-Router Link, useNavigate, NavLink
+In this repo we will build on our previous project but show you underlying mechanics of React-Router BrowserRouter, Routes, Link, useNavigate, and NavLink. As before useEffect, useState, useContext, useRef will be used.  We will recreate Link, useNavigate, and NavLink but with our own custom functions as well as use Tailwind CSS for styling. (Note we will focus on React-Router library but note there are other alternative navigation libraries like Wouter, React-Location, and Reach-Router)

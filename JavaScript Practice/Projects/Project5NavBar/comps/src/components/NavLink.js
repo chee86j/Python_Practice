@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { useContext } from 'react';
-import NavigationContext from '../context/NavigationContext';
+import NavigationContext from '../context/navigation';
 import Link from './Link';
 
 function NavLink({ to, children, className, activeClassName, ...rest }) {
