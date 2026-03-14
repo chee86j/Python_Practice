@@ -1,4 +1,4 @@
-import className from "classnames";
+import classNames from "classnames";
 
 function Panel({ children, className, ...rest }) {
     const finalClassNames = classNames(

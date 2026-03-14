@@ -1,24 +1,36 @@
-import { useState } from 'react';
-import Dropdown from './components/Dropdown';
+import Navbar from './components/Navbar';
+import Route from './components/Route';
+import AccordionPage from './pages/AccordionPage';
+import ButtonPage from './pages/ButtonPage';
+import DropdownPage from './pages/DropdownPage';
 
 function App() {
-  const [selected, setSelected] = useState(null);
+  return (
+    <div className='mx-6 mt-6 grid grid-cols-4 gap-6'>
+      <Navbar />
+      <main className='col-span-3'>
+        <Route path='/'>
+          <div className='rounded border bg-white p-5 shadow'>
+            {/* Short landing content so route transitions are easy to test while building your custom nav pieces. */}
+            <h1 className='mb-3 text-2xl font-semibold'>Project 5: Nav + Custom Routing</h1>
+            <p>Select a component page from the navbar to test navigation behavior.</p>
+          </div>
+        </Route>
 
-  const handleSelect = (option) => {
-    setSelected(option);
-  };
+        <Route path='/accordion'>
+          <AccordionPage />
+        </Route>
 
-  const options = [
-    { label: 'Red', value: 'red' },
-    { label: 'Green', value: 'green' },
-    { label: 'Blue', value: 'blue' },
-  ];
+        <Route path='/dropdown'>
+          <DropdownPage />
+        </Route>
 
-  return <div className='flex'>
-    <a href="/dashboard">Dashboard</a>
-    <Dropdown options={options} value={selected} onChange={handleSelect} /> 
-    <Dropdown options={options} value={selected} onChange={handleSelect} /> 
-  </div>
+        <Route path='/buttons'>
+          <ButtonPage />
+        </Route>
+      </main>
+    </div>
+  );
 }
 
 export default App;
