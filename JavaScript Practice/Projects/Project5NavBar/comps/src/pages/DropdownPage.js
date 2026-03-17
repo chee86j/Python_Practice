@@ -2,10 +2,10 @@ import { useState } from 'react';
 import Dropdown from '../components/Dropdown';
 
 function DropdownPage() {
-  const [selected, setSelected] = useState(null);
+  const [selection, setSelection] = useState(null);
 
   const handleSelect = (option) => {
-    setSelected(option);
+    setSelection(option);
   };
 
   const options = [
@@ -15,9 +15,8 @@ function DropdownPage() {
   ];
 
   return (
-    <div className='flex'>
-      <Dropdown options={options} value={selected} onChange={handleSelect} />
-      <Dropdown options={options} value={selected} onChange={handleSelect} />
+    <div className="flex">
+      <Dropdown options={options} value={selection} onChange={handleSelect} />
     </div>
   );
 }

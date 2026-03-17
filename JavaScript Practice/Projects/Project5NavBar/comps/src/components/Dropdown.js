@@ -37,7 +37,7 @@ function Dropdown({ options, value, onChange }) {
 
     const handleClick = () => {
         // Toggle the open/closed state when the dropdown header is clicked.
-        setIsOpen(!isOpen);
+        setIsOpen((currentIsOpen) => !currentIsOpen);
     };
 
     const handleOptionClick = (option) => {
@@ -48,14 +48,20 @@ function Dropdown({ options, value, onChange }) {
     };
 
     const renderedOptions = options.map((option) => {
-        return (
-            <div className='hover:bg-sky-100 rounded cursor-pointer p-1' onClick={() => handleOptionClick(option)} key={option.value}>{option.label}</div>
-        );
-    });
+    return (
+      <div
+        className="hover:bg-sky-100 rounded cursor-pointer p-1"
+        onClick={() => handleOptionClick(option)}
+        key={option.value}
+      >
+        {option.label}
+      </div>
+    );
+  });
     
     return (
         // Sometimes divEl might be null on first render, so we check it before accessing it.
-        <div ref={divEl} className='w-48'>
+        <div ref={divEl} className='relative w-48'>
             <Panel
             className='flex justify-between items-center cursor-pointer'
             onClick={handleClick}>
@@ -63,7 +69,7 @@ function Dropdown({ options, value, onChange }) {
                 {value?.label || 'Select...'}
                 <GoChevronDown className='text-lg' />
             </Panel>
-            {isOpen && <Panel className='absolute top-full' onClick={handleClick}>
+            {isOpen && <Panel className='absolute top-full z-10'>
                 {/* Each option calls handleOptionClick with the option data. */}
                 {renderedOptions}
             </Panel>}

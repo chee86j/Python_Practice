@@ -1,13 +1,19 @@
-import useNavigate from '../hooks/useNavigate';
+import classNames from 'classnames';
+import useNavigation from '../hooks/use-navigation';
 
-/* This Link component is the equivalent of React Router's Link component. It uses an anchor tag for semantics 
-and accessibility, but hijacks the click event to perform client-side navigation w/o a full page refresh. */
-function Link({ to, children, className, ...rest }) {
-  const navigate = useNavigate();
+/* Equivalent to React Router's <Link>:
+it renders a real <a> for semantics/accessibility, then intercepts normal left-click navigation. */
+function Link({ to, children, className, activeClassName }) {
+  const { navigate, currentPath } = useNavigation();
+
+  const classes = classNames(
+    'text-blue-500',
+    className,
+    currentPath === to && activeClassName
+  );
 
   const handleClick = (event) => {
-    /* If the user is opening in a new tab/window (cmd/ctrl click or middle click),
-    let the browser do its normal behavior and do not hijack it. */
+    // Match router-like behavior: do not hijack modified clicks or non-left-clicks.
     if (
       event.metaKey ||
       event.ctrlKey ||
@@ -18,12 +24,13 @@ function Link({ to, children, className, ...rest }) {
       return;
     }
 
+    // Prevent full page reload, then do client-side URL/state update.
     event.preventDefault();
     navigate(to);
   };
 
   return (
-    <a {...rest} href={to} onClick={handleClick} className={className}>
+    <a className={classes} href={to} onClick={handleClick}>
       {children}
     </a>
   );

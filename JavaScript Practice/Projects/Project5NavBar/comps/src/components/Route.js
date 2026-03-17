@@ -1,15 +1,15 @@
-import { useContext } from 'react';
-import NavigationContext from '../context/navigation';
+import useNavigation from "../hooks/use-navigation";
 
 function Route({ path, children }) {
-  const { currentPath } = useContext(NavigationContext);
+  const { currentPath } = useNavigation();
 
-  // Render children only when this route path matches the current browser path.
-  if (currentPath !== path) {
-    return null;
+  // Equivalent to a very small <Route>: render only when URL path matches.
+  if (currentPath === path) {
+    return children;
   }
 
-  return children;
+  // Returning null means "render nothing" for non-matching paths.
+  return null;
 }
 
 export default Route;

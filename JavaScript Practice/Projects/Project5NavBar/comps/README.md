@@ -69,5 +69,57 @@ This next section will focus on how React components interact with native DOM ev
 - Explaining why `true` is sometimes passed as the third argument to `addEventListener`
 - Issues with Element References i.e. <div classNames="w-48">
 
-## Understanding underlying mechanics before you use React-Router Link, useNavigate, NavLink
-In this repo we will build on our previous project but show you underlying mechanics of React-Router BrowserRouter, Routes, Link, useNavigate, and NavLink. As before useEffect, useState, useContext, useRef will be used.  We will recreate Link, useNavigate, and NavLink but with our own custom functions as well as use Tailwind CSS for styling. (Note we will focus on React-Router library but note there are other alternative navigation libraries like Wouter, React-Location, and Reach-Router)
+## Project5NavBar - Underlying navigation mechanics before React Router
+This section builds a minimal client-side router so the "why" behind React Router is visible. We use `useState`, `useEffect`, and `useContext` to recreate the core mechanics in a small, inspectable way.
+
+### Mapping to React Router concepts
+- `NavigationProvider` -> similar responsibility to `BrowserRouter` (stores current path + navigation function in context).
+- `navigate(to)` -> similar to `useNavigate()` (pushes a new history entry without a full page reload).
+- `Link` -> similar to `<Link>` (renders `<a>`, prevents default left-click navigation, then calls `navigate`).
+- `Route` -> simplified route matcher (renders children only when `currentPath === path`).
+- `activeClassName` in custom `Link` -> lightweight replacement for `<NavLink>` active styling.
+
+### Runtime flow (what actually happens)
+1. Initial render reads `window.location.pathname` into React state.
+2. Clicking a custom `Link` calls `event.preventDefault()` and then `window.history.pushState(...)`.
+3. The provider updates `currentPath`, which causes `Route` components to re-check matches and re-render.
+4. Browser back/forward buttons trigger `popstate`; the provider listens for that and re-syncs `currentPath`.
+
+### Visual flow (custom router vs React Router)
+```text
+CUSTOM ROUTER (this project)                     REACT ROUTER (library)
+-------------------------------------            --------------------------------------
++-------------------------------+                +-------------------------------+
+| Click <Link to="/buttons">   |                | Click <Link to="/buttons">   |
++---------------+---------------+                +---------------+---------------+
+                |                                                |
+                v                                                v
++-------------------------------+                +-------------------------------+
+| handleClick(event)            |                | RR Link internals             |
+| - preventDefault()            |                | - prevent default nav         |
+| - navigate("/buttons")        |                | - trigger router navigate     |
++---------------+---------------+                +---------------+---------------+
+                |                                                |
+                v                                                v
++-------------------------------+                +-------------------------------+
+| window.history.pushState(...) |                | navigate("/buttons")          |
+| setCurrentPath("/buttons")    |                | (via router context)          |
++---------------+---------------+                +---------------+---------------+
+                |                                                |
+                v                                                v
++-------------------------------+                +-------------------------------+
+| Context value changes         |                | Router state/location changes |
+| -> React re-render            |                | -> React re-render            |
++---------------+---------------+                +---------------+---------------+
+                |                                                |
+                v                                                v
++-------------------------------+                +-------------------------------+
+| <Route path="/buttons">       |                | <Route path="/buttons">       |
+| currentPath === path ? render |                | route match -> render element |
++-------------------------------+                +-------------------------------+
+
+Back/Forward (both):
+window "popstate" -> update current path -> re-render matching route
+```
+
+Compared with React Router, this project intentionally omits advanced features (nested routes, route params, loaders/actions, and transition APIs) so the fundamentals are easier to see.
