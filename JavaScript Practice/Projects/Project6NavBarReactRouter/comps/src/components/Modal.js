@@ -1,5 +1,5 @@
-function Modal () {
-    return <div>Modal</div>
+function Modal() {
+    return <div>Modal!</div>
 }
 
 export default Modal
