@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import AccordionPage from './pages/AccordionPage';
 import DropdownPage from './pages/DropdownPage';
 import ButtonPage from './pages/ButtonPage';
+import ModalPage from './pages/ModalPage';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/accordion" element={<AccordionPage />} />
           <Route path="/buttons" element={<ButtonPage />} />
           <Route path="/button" element={<ButtonPage />} />
+          <Route path="/modal" element={<ModalPage />} />
         </Routes>
       </div>
     </div>
