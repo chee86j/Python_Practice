@@ -124,4 +124,40 @@ window "popstate" -> update current path -> re-render matching route
 
 Compared with React Router, this project intentionally omits advanced features (nested routes, route params, loaders/actions, and transition APIs) so the fundamentals are easier to see.
 
-## Project6NavBarReactRouter - Previous navigation mechanics using React Router library
+## Project6NavBarReactRouter - Navigation with React Router
+This builds on Project 5 and migrates navigation to `react-router-dom`. It also adds a modal demo rendered through a React portal.
+
+### What is active in this repo now
+- `src/index.js` wraps `<App />` in `<BrowserRouter>`.
+- `src/App.js` defines route config with `<Routes>` and `<Route>`.
+- `src/components/Sidebar.js` uses:
+  - `<Link>` for normal navigation
+  - `<NavLink>` for active-state styling
+  - `useNavigate()` for programmatic navigation (`navigate('/buttons')`, `navigate(-1)`)
+- `src/pages/ModalPage.js` shows `Modal` with local state.
+- `src/components/Modal.js` uses `ReactDOM.createPortal(...)` and mounts into `.modal-container` in `index.html`.
+
+### Current route map
+- `/` -> `DropdownPage`
+- `/accordion` -> `AccordionPage`
+- `/buttons` -> `ButtonPage`
+- `/button` -> `ButtonPage` (alias route)
+- `/modal` -> `ModalPage`
+
+### Runtime flow with React Router
+1. The app bootstraps inside `<BrowserRouter>` so the URL/location state is managed by router context.
+2. Clicking `Link`/`NavLink` updates the URL without a full page reload.
+3. `<Routes>` evaluates matches and renders the route's `element`.
+4. Back/forward browser actions update location and re-render the matched routes automatically.
+5. `useNavigate` supports essential transitions and history moves.
+
+### Active link styling in this version
+`Sidebar` uses `NavLink` + `classnames`:
+- base classes: always applied
+- active classes: conditionally applied via `isActive`
+- `end={link.path === '/'}` prevents `/` from being marked active on every route
+
+### Modal notes
+- The modal is rendered outside the normal component tree via portal.
+- `index.html` includes `<div class="modal-container"></div>` as the portal target.
+- This keeps layering predictable and helps overlays sit above routed page content.
