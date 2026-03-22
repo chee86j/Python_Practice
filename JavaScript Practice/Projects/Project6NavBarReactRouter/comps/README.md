@@ -163,10 +163,24 @@ This builds on Project 5 and migrates navigation to `react-router-dom`. It also 
 - This keeps layering predictable and helps overlays sit above routed page content.
 
 ### Table notes
-- Variable number of rows
-- Variable numbder of columns
-- number of columns doesn't have to matc the number of properties in object
-- some columns are sortable
-- sortable columns can sort different kinds of values
-- cells can be calculated using multiple properties
-- cells can display arbitrary data
+Current implementation:
+- `TablePage` passes `data` (rows) and `config` (column definitions) into `Table`.
+- `config` uses objects with:
+  - `label`: text for the table header
+  - `render(row)`: function that returns what to show in each cell for that column
+- `Table` maps `config` once to render headers and maps it again per row to render cells.
+- The table supports a var number of rows and columns.
+- The number of columns does not need to match every property on each row object.
+
+What this teaches:
+- Data-driven UI: defined structure with configuration instead of hardcoding each column.
+- Passing behavior as props: `render` functions are passed from parent to child.
+- Reusable component design: one `Table` can render many datasets regardless of type
+- Separation of concerns:
+  - `TablePage` decides what data/columns exist
+  - `Table` decides how to draw the grid
+
+Next to be implemented:
+- Sortable columns for numbers and strings.
+- Custom cell rendering (icons, badges, conditional colors).
+- Derived cells computed from multiple properties.
