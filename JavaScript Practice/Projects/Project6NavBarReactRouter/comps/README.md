@@ -161,3 +161,12 @@ This builds on Project 5 and migrates navigation to `react-router-dom`. It also 
 - The modal is rendered outside the normal component tree via portal.
 - `index.html` includes `<div class="modal-container"></div>` as the portal target.
 - This keeps layering predictable and helps overlays sit above routed page content.
+
+### Table notes
+- Variable number of rows
+- Variable numbder of columns
+- number of columns doesn't have to matc the number of properties in object
+- some columns are sortable
+- sortable columns can sort different kinds of values
+- cells can be calculated using multiple properties
+- cells can display arbitrary data
