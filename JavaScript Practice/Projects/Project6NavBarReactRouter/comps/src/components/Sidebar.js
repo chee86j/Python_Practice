@@ -9,6 +9,7 @@ function Sidebar() {
     { label: 'Accordion', path: '/accordion' },
     { label: 'Buttons', path: '/buttons' },
     { label: 'Modal', path: '/modal' },
+    { label: 'Table', path: '/table' },
   ];
   const baseLinkClasses = 'mb-3 text-blue-500';
   const activeLinkClasses = 'font-bold border-l-4 border-blue-500 pl-2';
