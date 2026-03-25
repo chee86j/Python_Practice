@@ -15,17 +15,22 @@ function TablePage() {
      },
     { 
         label: 'Color',
-        render: (fruit) => fruit.color
+        render: (fruit) => <div className={`p-3 m-2 ${fruit.color}`} />
     },
     { 
         label: 'Score',
-        render: (fruit) => fruit.score
+        render: (fruit) => fruit.score,
+        header: () => <th className="bg-red-500">Score</th>,
     },
   ]
 
+  const keyFn = (fruit) => {
+    return fruit.name
+  }
+
   return (
     <div>
-        <Table data={data} config={config} />
+        <Table data={data} config={config} keyFn={keyFn} />
     </div>
     )
 }

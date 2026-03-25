@@ -173,7 +173,7 @@ Current implementation:
 - The number of columns does not need to match every property on each row object.
 
 What this teaches:
-- Data-driven UI: defined structure with configuration instead of hardcoding each column.
+- Data-driven UI: defined structure with configuration instead of hardcoding each column w/o the config.
 - Passing behavior as props: `render` functions are passed from parent to child.
 - Reusable component design: one `Table` can render many datasets regardless of type
 - Separation of concerns:
@@ -181,6 +181,8 @@ What this teaches:
   - `Table` decides how to draw the grid
 
 Next to be implemented:
-- Sortable columns for numbers and strings.
+- Sortable columns for numbers and strings and array of objects.
+--Unsorted to Ascending on Score to Descending on Score
+--then if another header cell is clicked after that will sort again based on last sort
 - Custom cell rendering (icons, badges, conditional colors).
 - Derived cells computed from multiple properties.
