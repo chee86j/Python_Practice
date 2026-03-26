@@ -1,5 +1,5 @@
 import Table from '../components/Table'
-
+import SortableTable from '../components/SortableTable'
 /* TablePage provides row data plus a column config object to the reusable Table component.
    Each config item defines a label, a render function for cell content, and an optional custom header.
    keyFn returns a stable unique value for each row so React can track row updates correctly. 
@@ -21,7 +21,8 @@ function TablePage() {
   const config = [
     { 
         label: 'Name',
-        render: (fruit) => fruit.name
+        render: (fruit) => fruit.name,
+        sortValue: (fruit) => fruit.name
      },
     { 
         label: 'Color',
@@ -30,7 +31,7 @@ function TablePage() {
     { 
         label: 'Score',
         render: (fruit) => fruit.score,
-        header: () => <th className="bg-red-500">Score</th>,
+        sortValue: (fruit) => fruit.score
     },
   ]
 
@@ -40,7 +41,7 @@ function TablePage() {
 
   return (
     <div>
-        <Table data={data} config={config} keyFn={keyFn} />
+        <SortableTable data={data} config={config} keyFn={keyFn} />
     </div>
     )
 }

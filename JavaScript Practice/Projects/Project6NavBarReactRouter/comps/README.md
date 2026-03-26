@@ -184,5 +184,11 @@ Next to be implemented:
 - Sortable columns for numbers and strings and array of objects.
 --Unsorted to Ascending on Score to Descending on Score
 --then if another header cell is clicked after that will sort again based on last sort
+--SortableTable component to
+---look at each object in the config array
+---does the object have a 'sortValue' function?
+---if so, this column must be sortable
+---add a 'header' property that will show a clickable header cell
+---when user clicks this, sort the data and pass sortedData down to table
 - Custom cell rendering (icons, badges, conditional colors).
 - Derived cells computed from multiple properties.
