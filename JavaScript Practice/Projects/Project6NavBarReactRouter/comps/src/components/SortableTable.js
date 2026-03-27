@@ -4,7 +4,7 @@ import Table from "./Table";
 function SortableTable(props) {
   const [sortOrder, setSortOrder] = useState(null);
   const [sortBy, setSortBy] = useState(null);
-  const { config } = props;
+  const { config, data } = props;
 
   /* 
      This is our updated list of config objects that we will pass to the Table 
@@ -43,10 +43,33 @@ function SortableTable(props) {
     };
   });
 
+  /* 
+  Only sort data if sortOrder && sortBy are not null
+  If not sorting, then make use of original through a copy of the 'data' prop.
+  If sorting, Find the correct sortValue function & use it for sorting
+  */
+
+  let sortedData = data;
+  if (sortOrder && sortBy) {
+    const { sortValue } = config.find((column) => column.label === sortBy);
+    sortedData = [...data].sort((a, b) => {
+      const valueA = sortValue(a);
+      const valueB = sortValue(b);
+
+      const reverseOrder = sortOrder === "asc" ? 1 : -1;
+
+      if (typeof valueA === "string") {
+        return valueA.localeCompare(valueB) * reverseOrder;
+      } else {
+        return (valueA - valueB) * reverseOrder;
+      }
+    });
+  }
+
   return (
     <div>
       {sortOrder} - {sortBy}
-      <Table {...props} config={updatedConfig} />;
+      <Table {...props} data={sortedData} config={updatedConfig} />;
     </div>
   );
   // the secondary config argument will overwrite the original config in {...props} when passed to Table, allowing us to inject our custom headers for sortable columns without modifying the original config object.
