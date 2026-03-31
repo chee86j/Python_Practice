@@ -6,8 +6,8 @@ function useSort(data, config) {
   const [sortOrder, setSortOrder] = useState(null);
   const [sortBy, setSortBy] = useState(null);
 
-  // handleSort cycles a column through ascending, descending, & unsorted.
-  const handleSort = (label) => {
+  // setSortColumn cycles a column through ascending, descending, & unsorted.
+  const setSortColumn = (label) => {
     if (sortBy && label !== sortBy) {
       setSortOrder("asc");
       setSortBy(label);
@@ -51,7 +51,7 @@ function useSort(data, config) {
     sortOrder,
     sortBy,
     sortedData,
-    handleSort,
+    setSortColumn,
   };
 }
 

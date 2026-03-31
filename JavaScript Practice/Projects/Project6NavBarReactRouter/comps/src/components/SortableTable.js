@@ -1,10 +1,13 @@
 import Table from "./Table";
 import { GoArrowSmallDown, GoArrowSmallUp } from "react-icons/go";
-import useSort from "../hooks/useSort";
+import useSort from "../hooks/use-Sort";
 
 function SortableTable(props) {
   const { config, data } = props;
-  const { sortOrder, sortBy, sortedData, handleSort } = useSort(data, config);
+  const { sortOrder, sortBy, sortedData, setSortColumn } = useSort(
+    data,
+    config,
+  );
 
   /* 
      This is our updated list of config objects that we will pass to the Table 
@@ -25,7 +28,7 @@ function SortableTable(props) {
       header: () => (
         <th
           className="cursor-pointer hover:bg-gray-100"
-          onClick={() => handleSort(column.label)}
+          onClick={() => setSortColumn(column.label)}
         >
           <div className="flex items-center">
             {getIcons(column.label, sortBy, sortOrder)} {column.label}
