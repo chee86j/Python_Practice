@@ -1,18 +1,19 @@
-import classNames from 'classnames';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import classNames from "classnames";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 function Sidebar() {
   const navigate = useNavigate();
 
   const links = [
-    { label: 'Dropdown', path: '/' },
-    { label: 'Accordion', path: '/accordion' },
-    { label: 'Buttons', path: '/buttons' },
-    { label: 'Modal', path: '/modal' },
-    { label: 'Table', path: '/table' },
+    { label: "Dropdown", path: "/" },
+    { label: "Accordion", path: "/accordion" },
+    { label: "Buttons", path: "/buttons" },
+    { label: "Modal", path: "/modal" },
+    { label: "Table", path: "/table" },
+    { label: "Counter", path: "/counter" },
   ];
-  const baseLinkClasses = 'mb-3 text-blue-500';
-  const activeLinkClasses = 'font-bold border-l-4 border-blue-500 pl-2';
+  const baseLinkClasses = "mb-3 text-blue-500";
+  const activeLinkClasses = "font-bold border-l-4 border-blue-500 pl-2";
 
   // Old custom Link code (replaced by NavLink):
   /*
@@ -38,7 +39,7 @@ function Sidebar() {
         className={({ isActive }) =>
           classNames(baseLinkClasses, isActive && activeLinkClasses)
         }
-        end={link.path === '/'}
+        end={link.path === "/"}
       >
         {link.label}
       </NavLink>
@@ -57,7 +58,7 @@ function Sidebar() {
       {/* useNavigate example (programmatic navigation): */}
       <button
         className="mt-2 rounded bg-blue-500 px-3 py-1 text-white"
-        onClick={() => navigate('/buttons')}
+        onClick={() => navigate("/buttons")}
         type="button"
       >
         Go To Buttons

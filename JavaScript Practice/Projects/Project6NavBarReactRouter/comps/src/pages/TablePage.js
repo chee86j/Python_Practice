@@ -1,4 +1,3 @@
-import Table from "../components/Table";
 import SortableTable from "../components/SortableTable";
 /* TablePage provides row data plus a column config object to the reusable Table component.
    Each config item defines a label, a render function for cell content, and an optional custom header.
@@ -10,13 +9,14 @@ function TablePage() {
     { name: "Apple", color: "bg-red-500", score: 3 },
     { name: "Banana", color: "bg-yellow-500", score: 1 },
     { name: "Lime", color: "bg-green-500", score: 4 },
+    { name: "Cherry", color: "bg-red-700", score: 2.5 },
   ];
 
   /* The purpose of the config array is to define how each column in the table should be rendered. 
-  Each object in the config array represents a column and contains:
-- label: The header text for the column.
-- render: A function that takes a data item (in this case, a fruit) and returns the content to be displayed in the cell for that column.
-- header (optional): A function that returns custom JSX for the column header, allowing for more complex header designs beyond just text.
+    Each object in the config array represents a column and contains:
+    - label: The header text for the column.
+    - render: A function that takes a data item (in this case, a fruit) and returns the content to be displayed in the cell for that column.
+    - header (optional): A function that returns custom JSX for the column header, allowing for more complex header designs beyond just text.
 */
   const config = [
     {
@@ -32,6 +32,11 @@ function TablePage() {
       label: "Score",
       render: (fruit) => fruit.score,
       sortValue: (fruit) => fruit.score,
+    },
+    {
+      label: "Score Squared",
+      render: (fruit) => fruit.score ** 2,
+      sortValue: (fruit) => fruit.score ** 2,
     },
   ];
 
