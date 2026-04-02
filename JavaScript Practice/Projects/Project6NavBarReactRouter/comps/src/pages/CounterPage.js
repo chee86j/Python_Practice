@@ -1,5 +1,5 @@
 import Button from "../components/Button";
-import useCounter from "../hooks/use-Counter";
+import useCounter from "../hooks/useCounter";
 
 /* CounterPage shows the usual custom-hook workflow:
    1. Identify stateful logic that belongs together.

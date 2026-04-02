@@ -211,7 +211,7 @@ What this teaches:
 
 - Custom hooks let us move related stateful logic out of a component & reuse it elsewhere.
 - `useSort` groups together sorting state, derived sorted data, & the function used when a header is clicked.
-- `use-Counter` groups together `count`, the logging side effect, & the increment behavior for the counter example.
+- `useCounter` groups together `count`, the logging side effect, & the increment behavior for the counter example.
 - The general workflow is:
   - identify logic in a component that belongs together
   - move it into a function whose name starts with `use`
